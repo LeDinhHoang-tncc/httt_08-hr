@@ -15,7 +15,7 @@ Bạn có thể copy nguyên combo này để dùng mỗi ngày:
 /
 git status
 git add .
-git commit -m "feat: describe your changes"
+git commit -m "feat: addd docx"
 git push
 /
 
@@ -42,3 +42,5 @@ Nếu git commit báo nothing to commit, nghĩa là không có thay đổi mới
 Mẹo cho dự án nhóm: Nếu có thành viên khác đẩy code lên cùng nhánh main, hãy đồng bộ trước khi push để tránh xung đột. Khi mới làm một mình trên nhánh main, combo trên thường là đủ.
 
 Vậy là từ giờ, cứ code xong → git add . → git commit → git push. Bạn có thể lưu combo này vào README hoặc ghi chú riêng để dùng lâu dài.
+
+python -m pip freeze > backend\requirements.txt
