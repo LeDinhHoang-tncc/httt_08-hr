@@ -1,4 +1,3 @@
-
 # HR Recruitment System
 
 Website quản lý tuyển dụng nhân sự, tích hợp API trích xuất dữ liệu từ CV và hỗ trợ chấm điểm ứng viên.

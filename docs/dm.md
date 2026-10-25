@@ -44,3 +44,12 @@ Mẹo cho dự án nhóm: Nếu có thành viên khác đẩy code lên cùng nh
 Vậy là từ giờ, cứ code xong → git add . → git commit → git push. Bạn có thể lưu combo này vào README hoặc ghi chú riêng để dùng lâu dài.
 
 python -m pip freeze > backend\requirements.txt
+
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r backend/requirements.txt
+
+alembic revision --autogenerate -m "message"	Tạo migration dựa trên thay đổi model
+alembic upgrade head	Áp dụng các migration mới nhất
+alembic current	Xem migration đang được áp dụng
+alembic history	Xem lịch sử migration
+alembic downgrade -1	Lùi lại một migration
