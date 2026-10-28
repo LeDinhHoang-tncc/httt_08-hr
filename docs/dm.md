@@ -54,3 +54,6 @@ python -m alembic upgrade head	Áp dụng các migration mới nhất
 alembic current	Xem migration đang được áp dụng
 alembic history	Xem lịch sử migration
 alembic downgrade -1	Lùi lại một migration
+
+
+http://127.0.0.1:8000/docs
