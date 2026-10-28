@@ -48,8 +48,9 @@ python -m pip freeze > backend\requirements.txt
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r backend/requirements.txt
 
-alembic revision --autogenerate -m "message"	Tạo migration dựa trên thay đổi model
-alembic upgrade head	Áp dụng các migration mới nhất
+python -m alembic revision --autogenerate -m "message"	Tạo migration dựa trên thay đổi model
+python -m alembic upgrade head	Áp dụng các migration mới nhất
+
 alembic current	Xem migration đang được áp dụng
 alembic history	Xem lịch sử migration
 alembic downgrade -1	Lùi lại một migration
