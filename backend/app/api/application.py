@@ -1,6 +1,7 @@
 from typing import Annotated, Literal
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from datetime import datetime, timezone
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, Form,status
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user, get_db
@@ -10,7 +11,7 @@ from app.schemas.application import (
     ApplicationResponse,
     ApplicationStatusUpdate,
 )
-from app.services import application_service
+from app.services import application_service, file_service
 
 
 router = APIRouter(
@@ -24,31 +25,81 @@ router = APIRouter(
     response_model=ApplicationResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def create_application(
-    data: ApplicationCreate,
-    db: Annotated[Session, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_user)],
+# hàm cũ giữ lại phòng hờ
+# def create_application(
+#     data: ApplicationCreate,
+#     db: Annotated[Session, Depends(get_db)],
+#     current_user: Annotated[User, Depends(get_current_user)],
+# ):
+#     try:
+#         return application_service.create_application(
+#             db=db,
+#             data=data,
+#             user_id=current_user.id,
+#         )
+#     except ValueError as exc:
+#         message = str(exc)
+
+#         if message == "Không tìm thấy tin tuyển dụng.":
+#             raise HTTPException(
+#                 status_code=status.HTTP_404_NOT_FOUND,
+#                 detail=message,
+#             )
+
+#         raise HTTPException(
+#             status_code=status.HTTP_409_CONFLICT,
+#             detail=message,
+#         )
+async def create_application(
+    job_id: int = Form(..., gt=0),
+    cover_letter:str | None = Form(default=None),
+    cv_file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    try:
+    saved_path = None
+
+    try: 
+    # 1 lưu cv vào server
+        saved_path = await file_service.save_cv(cv_file)
+
+    # 2 tao du lieu ho so ung tuyen
+        data = ApplicationCreate(
+            job_id=job_id,
+            cover_letter=cover_letter,
+        )
+    # 3 luu thong tin ho so ung tuyen 
         return application_service.create_application(
             db=db,
             data=data,
             user_id=current_user.id,
+            resume_url=saved_path,
+            original_filename=cv_file.filename,
+            uploaded_at=datetime.now(timezone.utc),
         )
     except ValueError as exc:
+        # xoa cv neu tao ho so that bai
+        if saved_path:
+            file_service.delete_cv(saved_path)
         message = str(exc)
-
         if message == "Không tìm thấy tin tuyển dụng.":
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=message,
             )
-
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail=message,
         )
 
+    except Exception:
+        # xoa cv neu xay ra loi khac
+        if saved_path:
+            file_service.delete_cv(saved_path)
+
+        raise
+    finally:
+        await cv_file.close()
 
 @router.get("", response_model=list[ApplicationResponse])
 def search_applications(

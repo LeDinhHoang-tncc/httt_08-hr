@@ -30,7 +30,7 @@ def get_current_user(
 ) -> User:
     credentials_error = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Token không hợp lệ hoặc đã hết hạn.",
+        detail="Token không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại!",
         headers={"WWW-Authenticate": "Bearer"},
     )
 

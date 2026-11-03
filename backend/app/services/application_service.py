@@ -9,19 +9,68 @@ from app.schemas.application import (
     ApplicationStatusUpdate,
 )
 
+from datetime import datetime
+
+# hàm cũ giữ lại đề phòng lỗi
+# def create_application(
+#     db: Session,
+#     data: ApplicationCreate,
+#     user_id: int,
+# ) -> Application:
+#     # Kiểm tra tin tuyển dụng có tồn tại không.
+#     job = db.get(Job, data.job_id)
+
+#     if job is None:
+#         raise ValueError("Không tìm thấy tin tuyển dụng.")
+
+#     # Kiểm tra ứng viên đã nộp hồ sơ cho tin này chưa.
+#     existing = db.scalar(
+#         select(Application).where(
+#             Application.user_id == user_id,
+#             Application.job_id == data.job_id,
+#         )
+#     )
+
+#     if existing is not None:
+#         raise ValueError("Bạn đã ứng tuyển vào tin tuyển dụng này.")
+
+#     application = Application(
+#         user_id=user_id,
+#         job_id=data.job_id,
+#         cover_letter=data.cover_letter,
+#         resume_url=data.resume_url,
+#         status="submitted",
+#     )
+
+#     try:
+#         db.add(application)
+#         db.commit()
+#         db.refresh(application)
+#     except IntegrityError:
+#         db.rollback()
+#         # Xử lý trường hợp hai yêu cầu nộp trùng xảy ra gần như đồng thời.
+#         raise ValueError("Bạn đã ứng tuyển vào tin tuyển dụng này.")
+#     except Exception:
+#         db.rollback()
+#         raise
+
+#     return application
 
 def create_application(
     db: Session,
     data: ApplicationCreate,
-    user_id: int,
+    user_id:int,
+    resume_url: str,
+    original_filename:str,
+    uploaded_at: datetime,
 ) -> Application:
-    # Kiểm tra tin tuyển dụng có tồn tại không.
+    #Kiem tra tin tuyen dung co ton tai khong.
     job = db.get(Job, data.job_id)
 
     if job is None:
         raise ValueError("Không tìm thấy tin tuyển dụng.")
 
-    # Kiểm tra ứng viên đã nộp hồ sơ cho tin này chưa.
+    #kiem tra ung vien da nop ho so cho tin nay chua.
     existing = db.scalar(
         select(Application).where(
             Application.user_id == user_id,
@@ -36,7 +85,9 @@ def create_application(
         user_id=user_id,
         job_id=data.job_id,
         cover_letter=data.cover_letter,
-        resume_url=data.resume_url,
+        resume_url=resume_url,
+        original_filename=original_filename,
+        uploaded_at=uploaded_at,
         status="submitted",
     )
 
@@ -44,16 +95,14 @@ def create_application(
         db.add(application)
         db.commit()
         db.refresh(application)
+
     except IntegrityError:
         db.rollback()
-        # Xử lý trường hợp hai yêu cầu nộp trùng xảy ra gần như đồng thời.
-        raise ValueError("Bạn đã ứng tuyển vào tin tuyển dụng này.")
+        raise ValueError("Bạn đã ứng tuyển vào tin tuyển dụng này rồi.")
     except Exception:
         db.rollback()
         raise
-
     return application
-
 
 def get_application_by_id(
     db: Session,
