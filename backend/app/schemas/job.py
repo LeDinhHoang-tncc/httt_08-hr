@@ -5,7 +5,8 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
-JobStatus = Literal["draft", "published", "closed"]
+JobStatus = Literal["draft", "published", "completed"]
+JobEditableStatus = Literal["draft", "published"]
 EmploymentType = Literal[
     "full_time",
     "part_time",
@@ -23,7 +24,7 @@ class JobCreate(BaseModel):
     employment_type: EmploymentType = "full_time"
     salary_min: Decimal | None = Field(default=None, ge=0)
     salary_max: Decimal | None = Field(default=None, ge=0)
-    status: JobStatus = "draft"
+    status: JobEditableStatus = "draft"
 
     @model_validator(mode="after")
     def validate_salary_range(self):
@@ -47,7 +48,7 @@ class JobUpdate(BaseModel):
     employment_type: EmploymentType | None = None
     salary_min: Decimal | None = Field(default=None, ge=0)
     salary_max: Decimal | None = Field(default=None, ge=0)
-    status: JobStatus | None = None
+    status: JobEditableStatus | None = None
 
     @model_validator(mode="after")
     def validate_salary_range(self):
@@ -75,6 +76,7 @@ class JobResponse(BaseModel):
     salary_min: Decimal | None
     salary_max: Decimal | None
     status: str
+    is_hidden: bool
     created_by: int
     created_at: datetime
     updated_at: datetime

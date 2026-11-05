@@ -9,6 +9,7 @@ from sqlalchemy import (
     String,
     Text,
     func,
+    Boolean,
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -56,6 +57,23 @@ class Job(Base):
 
     status: Mapped[str] = mapped_column(
         String(30), nullable=False, default="draft", index=True
+    )
+
+    status_before_hidden: Mapped[str | None] = mapped_column(
+        String(30),
+        nullable=True,
+    )
+
+    is_hidden: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default="false",
+    )
+
+    deleted_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
     )
 
     created_by: Mapped[int] = mapped_column(

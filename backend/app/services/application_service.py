@@ -2,6 +2,7 @@ from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.services import job_service
 from app.models.application import Application
 from app.models.job import Job
 from app.schemas.application import (
@@ -65,7 +66,7 @@ def create_application(
     uploaded_at: datetime,
 ) -> Application:
     #Kiem tra tin tuyen dung co ton tai khong.
-    job = db.get(Job, data.job_id)
+    job = job_service.get_public_job_by_id(db, data.job_id)
 
     if job is None:
         raise ValueError("Không tìm thấy tin tuyển dụng.")

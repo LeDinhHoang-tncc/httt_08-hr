@@ -1,9 +1,9 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, get_db
+from app.api.deps import get_current_user, get_optional_user, require_recruiter_or_admin, require_recruiter, require_admin, get_db
 from app.models.user import User
 from app.schemas.job import JobCreate, JobResponse, JobUpdate
 from app.services import job_service
@@ -20,7 +20,7 @@ router = APIRouter(prefix="/api/jobs", tags=["Jobs"])
 def create_job(
     data: JobCreate,
     db: Annotated[Session, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(require_recruiter)],
 ):
     try:
         return job_service.create_job(db, data, current_user.id)
@@ -55,13 +55,37 @@ def search_jobs(
     )
     return jobs
 
+@router.get("/manage", response_model=list[JobResponse])
+def search_managed_jobs(
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(require_recruiter_or_admin)],
+    keyword: str | None = None,
+    job_status: Literal["draft", "published", "completed"] | None = None,
+    is_hidden: bool | None = None,
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=10, ge=1, le=100),
+):
+    # Recruiter chỉ thấy tin của mình, Admin thấy tất cả.
+    created_by = current_user.id if current_user.role == "recruiter" else None
+
+    jobs, _ = job_service.search_managed_jobs(
+        db=db,
+        created_by=created_by,
+        keyword=keyword,
+        job_status=job_status,
+        is_hidden=is_hidden,
+        page=page,
+        page_size=page_size,
+    )
+    return jobs
 
 @router.get("/{job_id}", response_model=JobResponse)
 def get_job(
     job_id: int,
     db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User | None, Depends(get_optional_user)],
 ):
-    job = job_service.get_job_by_id(db, job_id)
+    job = job_service.get_viewable_job_by_id(db, job_id, current_user)
 
     if job is None:
         raise HTTPException(
@@ -71,24 +95,21 @@ def get_job(
 
     return job
 
-
 @router.put("/{job_id}", response_model=JobResponse)
 def update_job(
     job_id: int,
     data: JobUpdate,
     db: Annotated[Session, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(require_recruiter)],
 ):
     job = job_service.get_job_by_id(db, job_id)
 
-    if job is None:
+    if job is None or job.deleted_at is not None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Không tìm thấy tin tuyển dụng.",
         )
 
-    # Tạm thời chỉ người tạo tin mới được sửa tin đó.
-    # Phân quyền theo vai trò sẽ hoàn thiện ở giai đoạn sau.
     if job.created_by != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -104,15 +125,88 @@ def update_job(
         )
 
 
+@router.patch("/{job_id}/complete", response_model=JobResponse)
+def complete_job(
+    job_id: int,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(require_recruiter)],
+):
+    job = job_service.get_job_by_id(db, job_id)
+
+    if job is None or job.deleted_at is not None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Không tìm thấy tin tuyển dụng.",
+        )
+
+    if job.created_by != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Bạn không có quyền kết thúc tuyển dụng tin này.",
+        )
+
+    try:
+        return job_service.complete_job(db, job)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(exc),
+        )
+
+@router.patch("/{job_id}/hide", response_model=JobResponse)
+def hide_job(
+    job_id: int,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(require_admin)],
+):
+    job = job_service.get_job_by_id(db, job_id)
+
+    if job is None or job.deleted_at is not None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Không tìm thấy tin tuyển dụng.",
+        )
+
+    try:
+        return job_service.hide_job(db, job)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(exc),
+        )
+
+
+@router.patch("/{job_id}/unhide", response_model=JobResponse)
+def unhide_job(
+    job_id: int,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(require_admin)],
+):
+    job = job_service.get_job_by_id(db, job_id)
+
+    if job is None or job.deleted_at is not None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Không tìm thấy tin tuyển dụng.",
+        )
+
+    try:
+        return job_service.unhide_job(db, job)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(exc),
+        )
+
 @router.delete("/{job_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_job(
     job_id: int,
     db: Annotated[Session, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(require_recruiter)],
 ):
     job = job_service.get_job_by_id(db, job_id)
 
-    if job is None:
+    if job is None or job.deleted_at is not None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Không tìm thấy tin tuyển dụng.",
@@ -124,5 +218,12 @@ def delete_job(
             detail="Bạn không có quyền xóa tin tuyển dụng này.",
         )
 
-    job_service.delete_job(db, job)
+    try:
+        job_service.delete_job(db, job)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(exc),
+        )
+
     return Response(status_code=status.HTTP_204_NO_CONTENT)
