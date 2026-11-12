@@ -10,6 +10,7 @@ ApplicationStatus = Literal[
     "interview",
     "accepted",
     "rejected",
+    "withdrawn",  # ứng viên tự rút hồ sơ
 ]
 
 
@@ -19,6 +20,8 @@ class ApplicationCreate(BaseModel):
 
 
 class ApplicationStatusUpdate(BaseModel):
+    # Recruiter chỉ được chuyển sang các trạng thái này.
+    # "withdrawn" chỉ dành cho ứng viên (endpoint riêng).
     status: Literal[
         "reviewing",
         "interview",
@@ -34,9 +37,17 @@ class ApplicationResponse(BaseModel):
     user_id: int
     job_id: int
     status: ApplicationStatus
+    hidden_by_candidate: bool
     cover_letter: str | None
     resume_url: str | None
     original_filename: str | None
     uploaded_at: datetime | None
     created_at: datetime
     updated_at: datetime
+
+
+class ApplicationListResponse(BaseModel):
+    items: list[ApplicationResponse]
+    total: int
+    page: int
+    page_size: int

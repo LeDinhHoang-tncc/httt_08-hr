@@ -1,5 +1,12 @@
 # PROJECT HANDOFF – HTTT08
 
+
+python -m uvicorn app.main:app --app-dir backend --reload     
+
+ npm run dev    
+
+ 
+
 ## 1. Thông tin dự án
 
 **Tên đề tài:** Xây dựng website Quản lý Tuyển dụng Nhân sự, tích hợp API trích xuất dữ liệu từ CV và tin tuyển dụng (HTTT08).

@@ -1,0 +1,195 @@
+/* Dùng các biến màu khai báo trong Header.css */
+
+/* ---------- Thẻ đăng ký ---------- */
+
+.register-page {
+  width: 100%;
+  max-width: 440px;
+  margin: 48px auto 64px; /* footer tự dính đáy nhờ margin-top:auto */
+  padding: 36px 40px 32px;
+  background: #ffffff;
+  border: 1px solid var(--color-border, #e3e8ee);
+  border-radius: 14px;
+  color: var(--color-text, #1f2a37);
+}
+
+.register-page h1 {
+  margin: 0 0 24px;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+/* ---------- Logo: bấm để về trang chủ ---------- */
+
+.register-page .auth-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 28px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--color-text, #1f2a37);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+/* Biểu tượng nhỏ trước logo, giống logo ở Header */
+.register-page .auth-logo::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  border-radius: 4px 4px 4px 0;
+  background: var(--color-brand, #0e6b5c);
+}
+
+.register-page .auth-logo:hover {
+  color: var(--color-brand, #0e6b5c);
+}
+
+.register-page .auth-logo:focus-visible {
+  outline: 3px solid rgba(14, 107, 92, 0.35);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ---------- Form ---------- */
+
+.register-page form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.register-page .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.register-page label {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--color-text, #1f2a37);
+}
+
+.register-page input {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--color-text, #1f2a37);
+  background: #ffffff;
+  border: 1.5px solid var(--color-border, #e3e8ee);
+  border-radius: 8px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.register-page input:hover {
+  border-color: #c9d1da;
+}
+
+.register-page input:focus {
+  outline: none;
+  border-color: var(--color-brand, #0e6b5c);
+  box-shadow: 0 0 0 3px rgba(14, 107, 92, 0.15);
+}
+
+/* ---------- Thông báo lỗi / thành công ---------- */
+
+.register-page .error-message,
+.register-page .success-message {
+  margin: 0;
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  border-radius: 8px;
+}
+
+.register-page .error-message {
+  color: #b42318;
+  background: #fef3f2;
+  border: 1px solid #f4b9b4;
+}
+
+.register-page .success-message {
+  color: var(--color-brand-dark, #0a5247);
+  background: var(--color-brand-soft, #e6f2ef);
+  border: 1px solid #b7dad2;
+}
+
+/* ---------- Nút gửi ---------- */
+
+.register-page button[type="submit"] {
+  height: 48px;
+  margin-top: 4px;
+  font-family: inherit;
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--color-brand, #0e6b5c);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.register-page button[type="submit"]:hover:not(:disabled) {
+  background: var(--color-brand-dark, #0a5247);
+}
+
+.register-page button[type="submit"]:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.register-page button[type="submit"]:focus-visible {
+  outline: 3px solid rgba(14, 107, 92, 0.35);
+  outline-offset: 2px;
+}
+
+/* ---------- Dòng chuyển trang (đăng nhập) ---------- */
+
+.register-page > p {
+  margin: 24px 0 0;
+  padding-top: 20px;
+  font-size: 0.92rem;
+  text-align: center;
+  color: var(--color-muted, #5b6776);
+  border-top: 1px solid var(--color-border, #e3e8ee);
+}
+
+.register-page > p a {
+  font-weight: 600;
+  color: var(--color-brand, #0e6b5c);
+}
+
+.register-page > p a:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 520px) {
+  .register-page {
+    width: auto;
+    margin: 20px 12px 40px;
+    padding: 24px 20px 24px;
+    border-radius: 12px;
+  }
+
+  .register-page h1 {
+    font-size: 1.4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .register-page .auth-logo,
+  .register-page input,
+  .register-page button[type="submit"] {
+    transition: none;
+  }
+}

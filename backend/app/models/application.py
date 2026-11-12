@@ -2,6 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import (
     DateTime,
+    Boolean,
     ForeignKey,
     String,
     Text,
@@ -47,6 +48,13 @@ class Application(Base):
         default="submitted",
         index=True,
     )
+
+    hidden_by_candidate: Mapped[bool] = mapped_column(
+    Boolean,
+    nullable=False,
+    default=False,
+    server_default="false",
+)
 
     cover_letter: Mapped[str | None] = mapped_column(
         Text,

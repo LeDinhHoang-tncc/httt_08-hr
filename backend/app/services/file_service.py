@@ -94,3 +94,16 @@ def delete_cv(relative_path: str) -> None:
         raise ValueError("Đường dẫn file CV không hợp lệ.")
 
     file_path.unlink(missing_ok=True)
+
+def get_cv_path(relative_path: str) -> Path:
+    storage_dir = CV_STORAGE_DIR.resolve()
+    file_path = (BASE_DIR / relative_path).resolve()
+
+    # Đảm bảo file nằm bên trong thư mục lưu CV
+    if storage_dir not in file_path.parents:
+        raise ValueError("Đường dẫn file CV không hợp lệ.")
+
+    if not file_path.is_file():
+        raise FileNotFoundError("Không tìm thấy file CV.")
+
+    return file_path
