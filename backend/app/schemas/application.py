@@ -45,6 +45,26 @@ class ApplicationResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
+class CandidateSummary(BaseModel):
+    full_name: str
+    email: str
+
+
+class JobSummary(BaseModel):
+    title: str
+    company_name: str
+
+
+class ReceivedApplicationResponse(ApplicationResponse):
+    candidate: CandidateSummary
+    job: JobSummary
+
+
+class ReceivedApplicationListResponse(BaseModel):
+    items: list[ReceivedApplicationResponse]
+    total: int
+    page: int
+    page_size: int
 
 class ApplicationListResponse(BaseModel):
     items: list[ApplicationResponse]

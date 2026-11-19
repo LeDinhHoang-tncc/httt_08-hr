@@ -6,8 +6,11 @@ from sqlalchemy.orm import Session
 
 from app.models.application import Application
 from app.models.job import Job
+from app.models.user import User
+
 from app.schemas.application import ApplicationCreate
 from app.services import job_service
+
 
 
 # ---------------------------------------------------------------------------
@@ -202,11 +205,13 @@ def search_received_applications(
     application_status: str | None = None,
     page: int = 1,
     page_size: int = 10,
-) -> tuple[list[Application], int]:
-    """Hồ sơ ứng tuyển vào các tin do recruiter này đăng."""
+) -> tuple[list[tuple[Application, User, Job]], int]:
+    """Hồ sơ ứng tuyển kèm thông tin ứng viên và tin tuyển dụng."""
+
     query = (
-        select(Application)
+        select(Application, User, Job)
         .join(Job, Job.id == Application.job_id)
+        .join(User, User.id == Application.user_id)
         .where(
             Job.created_by == recruiter_id,
             Application.hidden_by_candidate.is_(False),
@@ -215,10 +220,27 @@ def search_received_applications(
 
     if job_id is not None:
         query = query.where(Application.job_id == job_id)
+
     if application_status is not None:
         query = query.where(Application.status == application_status)
 
-    return _paginate(db, query, page, page_size)
+    count_query = select(func.count()).select_from(
+        query.order_by(None).subquery()
+    )
+    total = db.scalar(count_query) or 0
+
+    query = (
+        query.order_by(
+            Application.created_at.desc(),
+            Application.id.desc(),
+        )
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+    )
+
+    rows = db.execute(query).all()
+
+    return rows, total
 
 
 def search_all_applications(

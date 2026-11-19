@@ -23,6 +23,8 @@ from app.schemas.application import (
     ApplicationListResponse,
     ApplicationResponse,
     ApplicationStatusUpdate,
+    ReceivedApplicationResponse,
+    ReceivedApplicationListResponse,
 )
 from app.services import application_service, file_service
 from app.services.application_service import (
@@ -238,7 +240,10 @@ def search_my_applications(
 # LƯU Ý: phải khai báo TRƯỚC "/{application_id}", nếu không "received"
 # sẽ bị hiểu là application_id và trả 422.
 # ---------------------------------------------------------------------------
-@router.get("/received", response_model=ApplicationListResponse)
+@router.get(
+    "/received",
+    response_model=ReceivedApplicationListResponse,
+)
 def search_received_applications(
     db: DbDep,
     current_user: UserDep,
@@ -261,7 +266,34 @@ def search_received_applications(
         page=page,
         page_size=page_size,
     )
-    return _build_list_response(applications, total, page, page_size)
+
+    items = []
+
+    for application, candidate, job in applications:
+        application_data = ApplicationResponse.model_validate(
+            application
+        ).model_dump()
+
+        items.append(
+            ReceivedApplicationResponse(
+                **application_data,
+                candidate={
+                    "full_name": candidate.full_name,
+                    "email": candidate.email,
+                },
+                job={
+                    "title": job.title,
+                    "company_name": job.company_name,
+                },
+            )
+        )
+
+    return ReceivedApplicationListResponse(
+        items=items,
+        total=total,
+        page=page,
+        page_size=page_size,
+    )
 
 # ---------------------------------------------------------------------------
 # Chi tiết + tải CV (candidate chủ hồ sơ hoặc recruiter chủ tin)
