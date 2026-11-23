@@ -1,0 +1,237 @@
+/* Dùng các biến màu khai báo trong Header.css */
+
+.admin-recruiter-requests {
+  width: 100%;
+  max-width: 1200px;
+  margin: 32px auto 56px; /* footer tự dính đáy nhờ margin-top:auto */
+  padding: 0 24px;
+  color: var(--color-text, #1f2a37);
+}
+
+.admin-recruiter-requests h1 {
+  margin: 0 0 8px;
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+/* Link "← Quay về Dashboard Admin" (mũi tên đã có sẵn trong chữ) */
+.admin-recruiter-requests .btn-back-dashboard {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-muted, #5b6776);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.admin-recruiter-requests .btn-back-dashboard:hover {
+  color: var(--color-brand, #0e6b5c);
+}
+
+.admin-recruiter-requests .btn-back-dashboard:focus-visible {
+  outline: 3px solid rgba(14, 107, 92, 0.35);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Thông báo đang tải / lỗi (hai dòng chữ trần nằm trực tiếp trong trang) */
+.admin-recruiter-requests > p {
+  margin: 0 0 20px;
+  padding: 16px 22px;
+  color: var(--color-muted, #5b6776);
+  background: #ffffff;
+  border: 1px dashed var(--color-border, #e3e8ee);
+  border-radius: 10px;
+}
+
+/* ---------- Khung chứa bảng ---------- */
+
+.recruiter-request-list {
+  overflow-x: auto; /* màn hình hẹp thì bảng cuộn ngang trong khung */
+  background: #ffffff;
+  border: 1px solid var(--color-border, #e3e8ee);
+  border-radius: 12px;
+}
+
+.recruiter-request-list h2 {
+  margin: 0;
+  padding: 18px 22px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  border-bottom: 1px solid var(--color-border, #e3e8ee);
+}
+
+/* "Đang tải dữ liệu..." / "Không có ..." */
+.recruiter-request-list > p {
+  margin: 0;
+  padding: 28px 22px;
+  color: var(--color-muted, #5b6776);
+}
+
+.recruiter-request-list table {
+  width: 100%;
+  min-width: 780px;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.recruiter-request-list th {
+  padding: 12px 16px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: left;
+  white-space: nowrap;
+  color: var(--color-muted, #5b6776);
+  background: var(--color-page, #f6f8fa);
+  border-bottom: 1px solid var(--color-border, #e3e8ee);
+}
+
+.recruiter-request-list td {
+  padding: 13px 16px;
+  vertical-align: middle;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  border-top: 1px solid var(--color-border, #e3e8ee);
+}
+
+.recruiter-request-list tbody tr:first-child td {
+  border-top: none;
+}
+
+.recruiter-request-list tbody tr:hover {
+  background: #fafbfc;
+}
+
+/* Cột ID: nhỏ, màu nhạt */
+.recruiter-request-list th:first-child,
+.recruiter-request-list td:first-child {
+  width: 60px;
+  padding-left: 22px;
+}
+
+.recruiter-request-list td:first-child {
+  color: var(--color-muted, #5b6776);
+}
+
+/* Cột Thao tác: các nút nằm cùng một hàng */
+.recruiter-request-list td:last-child {
+  white-space: nowrap;
+}
+
+.recruiter-request-list td button {
+  padding: 6px 14px;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.recruiter-request-list td button:focus-visible {
+  outline: 3px solid rgba(14, 107, 92, 0.35);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .admin-recruiter-requests {
+    margin: 16px auto 40px;
+    padding: 0 16px;
+  }
+
+  .admin-recruiter-requests h1 {
+    font-size: 1.4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-recruiter-requests .btn-back-dashboard,
+  .recruiter-request-list td button {
+    transition: none;
+  }
+}
+
+/* ---------- Nút "Phê duyệt" / "Từ chối" trong bảng ---------- */
+
+.recruiter-request-list td button:first-of-type {
+  margin-right: 8px;
+  color: #ffffff;
+  background: var(--color-brand, #0e6b5c);
+  border: 1.5px solid var(--color-brand, #0e6b5c);
+}
+
+.recruiter-request-list td button:first-of-type:hover {
+  background: var(--color-brand-dark, #0a5247);
+  border-color: var(--color-brand-dark, #0a5247);
+}
+
+.recruiter-request-list td button:last-of-type {
+  color: #b42318;
+  background: transparent;
+  border: 1.5px solid #f4b9b4;
+}
+
+.recruiter-request-list td button:last-of-type:hover {
+  background: #fef3f2;
+  border-color: #b42318;
+}
+
+/* ---------- Phân trang ---------- */
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin-top: 24px;
+}
+
+.pagination button {
+  height: 38px;
+  padding: 0 18px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-brand, #0e6b5c);
+  background: #ffffff;
+  border: 1.5px solid var(--color-brand, #0e6b5c);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+  color: #ffffff;
+  background: var(--color-brand, #0e6b5c);
+}
+
+.pagination button:disabled {
+  color: var(--color-muted, #5b6776);
+  border-color: var(--color-border, #e3e8ee);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.pagination button:focus-visible {
+  outline: 3px solid rgba(14, 107, 92, 0.35);
+  outline-offset: 2px;
+}
+
+.pagination span {
+  font-size: 0.9rem;
+  color: var(--color-muted, #5b6776);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pagination button {
+    transition: none;
+  }
+}

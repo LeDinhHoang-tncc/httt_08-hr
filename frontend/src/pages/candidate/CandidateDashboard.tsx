@@ -3,10 +3,12 @@ import { useAuth } from "../../contexts/AuthContext";
 import {
   getMyApplications,
   getJobById,
+  hideApplication,
   type Application,
 } from "../../services/applicationService";
 import type { Job } from "../../types/job";
 import { Link } from "react-router-dom";
+import ConfirmDialog from "../../components/common/ConfirmDialog";
 
 import "./CandidateDashboard.css";
 
@@ -30,6 +32,41 @@ function CandidateDashboard() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+
+  // Đơn đang chờ người dùng xác nhận xóa trong hộp thoại
+  const [applicationToDelete, setApplicationToDelete] =
+    useState<Application | null>(null);
+    const [actionError, setActionError] = useState("");
+
+    const handleDeleteApplication = async (application: Application) => {
+    try {
+      setDeletingId(application.id);
+      setActionError("");
+
+      await hideApplication(application.id);
+
+      setApplications((previous) =>
+        previous.filter((item) => item.id !== application.id)
+      );
+    } catch (err) {
+      setActionError(
+        err instanceof Error ? err.message : "Không thể xóa đơn ứng tuyển."
+      );
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!applicationToDelete) return;
+
+    const target = applicationToDelete;
+    setApplicationToDelete(null);
+
+    await handleDeleteApplication(target);
+  };
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -81,6 +118,8 @@ function CandidateDashboard() {
 
         {error && <p className="error-message">{error}</p>}
 
+        {actionError && <p className="error-message">{actionError}</p>}
+
         {!loading && !error && applications.length === 0 && (
           <p>Bạn chưa có đơn ứng tuyển nào.</p>
         )}
@@ -115,11 +154,32 @@ function CandidateDashboard() {
                 <Link to={`/candidate/applications/${application.id}`}>
                     Xem chi tiết đơn
                 </Link>
+                {["accepted", "rejected", "withdrawn"].includes(application.status) && (
+                  <button
+                    type="button"
+                    onClick={() => setApplicationToDelete(application)}
+                    disabled={deletingId === application.id}
+                  >
+                    {deletingId === application.id ? "Đang xóa..." : "Xóa đơn"}
+                  </button>
+                )}
               </article>
             ))}
           </div>
         )}
       </section>
+
+      <ConfirmDialog
+        open={applicationToDelete !== null}
+        variant="danger"
+        title="Xóa đơn ứng tuyển?"
+        message={`Bạn có chắc muốn xóa đơn ứng tuyển #${
+          applicationToDelete?.id ?? ""
+        }?`}
+        confirmText="Xóa đơn"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setApplicationToDelete(null)}
+      />
     </main>
   );
 }

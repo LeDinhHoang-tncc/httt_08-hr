@@ -35,7 +35,16 @@ function Header() {
                   Dashboard ứng viên
                 </Link>
               )}
-
+              {user.role === "recruiter" && (
+                <Link to="/recruiter/dashboard" className="btn-dashboard">
+                  Dashboard nhà tuyển dụng
+                </Link>
+              )}
+              {user.role === "admin" && (
+                <Link to="/admin/dashboard" className="btn-dashboard">
+                  Dashboard Admin
+                </Link>
+              )}
               <button
                 type="button"
                 className="btn-logout"

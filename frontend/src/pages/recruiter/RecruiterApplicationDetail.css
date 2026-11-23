@@ -1,0 +1,266 @@
+/* Dùng các biến màu khai báo trong Header.css */
+
+/* Cả trang là một thẻ trắng duy nhất
+   (cũng dùng cho trạng thái đang tải / lỗi vì cùng là thẻ main) */
+.recruiter-application-detail {
+  width: 100%;
+  max-width: 820px;
+  margin: 32px auto 56px; /* footer tự dính đáy nhờ margin-top:auto */
+  padding: 36px 44px 44px;
+  background: #ffffff;
+  border: 1px solid var(--color-border, #e3e8ee);
+  border-radius: 14px;
+  color: var(--color-text, #1f2a37);
+}
+
+/* ---------- Link quay lại ---------- */
+
+.recruiter-application-detail > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-muted, #5b6776);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.recruiter-application-detail > a::before {
+  content: "\2190";
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.recruiter-application-detail > a:hover {
+  color: var(--color-brand, #0e6b5c);
+}
+
+.recruiter-application-detail > a:focus-visible {
+  outline: 3px solid rgba(14, 107, 92, 0.35);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Trạng thái lỗi / không tìm thấy */
+.recruiter-application-detail > .error-message {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: #b42318;
+  background: #fef3f2;
+  border: 1px solid #f4b9b4;
+  border-radius: 8px;
+}
+
+/* ---------- Thông tin hồ sơ ---------- */
+
+.recruiter-application-info {
+  margin-top: 24px;
+}
+
+.recruiter-application-info h1 {
+  margin: 0 0 4px;
+  font-size: clamp(1.35rem, 3.5vw, 1.8rem);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+/* Tiêu đề từng phần: ngăn cách bằng đường kẻ mỏng */
+.recruiter-application-info h2 {
+  margin: 28px 0 14px;
+  padding-top: 24px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  border-top: 1px solid var(--color-border, #e3e8ee);
+}
+
+/* "CV ứng tuyển", "Thư giới thiệu": tiêu đề nhỏ */
+.recruiter-application-info h3 {
+  margin: 22px 0 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.recruiter-application-info p {
+  margin: 0 0 8px;
+  font-size: 0.97rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+/* Thư giới thiệu (đoạn cuối của khối): giữ xuống dòng, dòng không quá dài */
+.recruiter-application-info > p:last-child {
+  max-width: 70ch;
+  line-height: 1.75;
+  color: #374151;
+  white-space: pre-line;
+}
+
+/* Nút "Tải CV" */
+.recruiter-application-info > button {
+  padding: 6px 14px;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--color-brand, #0e6b5c);
+  background: transparent;
+  border: 1.5px solid var(--color-brand, #0e6b5c);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.recruiter-application-info > button:hover {
+  background: var(--color-brand-soft, #e6f2ef);
+}
+
+/* ---------- Xử lý hồ sơ: khung nền xanh nhạt ---------- */
+
+.recruiter-application-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+  margin-top: 32px;
+  padding: 22px 26px 24px;
+  background: var(--color-brand-soft, #e6f2ef);
+  border: 1px solid #cfe7e1;
+  border-radius: 12px;
+}
+
+.recruiter-application-actions h2 {
+  flex: 0 0 100%;
+  margin: 0 0 2px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.recruiter-application-actions label {
+  flex: 0 0 100%;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--color-muted, #5b6776);
+}
+
+/* Ô chọn trạng thái mới */
+.recruiter-application-actions select {
+  flex: 1 1 220px;
+  min-width: 0;
+  height: 44px;
+  padding: 0 40px 0 14px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--color-text, #1f2a37);
+  background-color: #ffffff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%235b6776' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  border: 1.5px solid var(--color-border, #e3e8ee);
+  border-radius: 8px;
+  appearance: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.recruiter-application-actions select:focus {
+  outline: none;
+  border-color: var(--color-brand, #0e6b5c);
+  box-shadow: 0 0 0 3px rgba(14, 107, 92, 0.15);
+}
+
+.recruiter-application-actions select:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Nút "Cập nhật trạng thái" */
+.recruiter-application-actions button {
+  height: 44px;
+  padding: 0 22px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--color-brand, #0e6b5c);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.recruiter-application-actions button:hover:not(:disabled) {
+  background: var(--color-brand-dark, #0a5247);
+}
+
+.recruiter-application-actions button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Thông báo trong khung: hồ sơ đã kết thúc / lỗi / thành công */
+.recruiter-application-actions p {
+  flex: 0 0 100%;
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--color-muted, #5b6776);
+}
+
+.recruiter-application-actions .error-message,
+.recruiter-application-actions .success-message {
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+
+.recruiter-application-actions .error-message {
+  color: #b42318;
+  background: #fef3f2;
+  border: 1px solid #f4b9b4;
+}
+
+.recruiter-application-actions .success-message {
+  color: var(--color-brand-dark, #0a5247);
+  background: #ffffff;
+  border: 1px solid #b7dad2;
+}
+
+.recruiter-application-info > button:focus-visible,
+.recruiter-application-actions button:focus-visible {
+  outline: 3px solid rgba(14, 107, 92, 0.35);
+  outline-offset: 2px;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 640px) {
+  .recruiter-application-detail {
+    width: auto;
+    margin: 16px 12px 40px;
+    padding: 24px 20px 28px;
+    border-radius: 12px;
+  }
+
+  .recruiter-application-actions {
+    padding: 18px 16px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .recruiter-application-actions button {
+    flex: 1 1 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recruiter-application-detail > a,
+  .recruiter-application-info > button,
+  .recruiter-application-actions select,
+  .recruiter-application-actions button {
+    transition: none;
+  }
+}

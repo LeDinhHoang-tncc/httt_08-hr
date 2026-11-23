@@ -1,0 +1,331 @@
+/* Dùng các biến màu khai báo trong Header.css */
+
+.admin-applications {
+  width: 100%;
+  max-width: 1200px;
+  margin: 32px auto 56px; /* footer tự dính đáy nhờ margin-top:auto */
+  padding: 0 24px;
+  color: var(--color-text, #1f2a37);
+}
+
+.admin-applications h1 {
+  margin: 0 0 8px;
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+/* Thông báo đang tải / lỗi / không có dữ liệu (chữ trần nằm trong trang) */
+.admin-applications > p {
+  margin: 0 0 20px;
+  padding: 16px 22px;
+  color: var(--color-muted, #5b6776);
+  background: #ffffff;
+  border: 1px dashed var(--color-border, #e3e8ee);
+  border-radius: 10px;
+}
+
+.admin-applications > p.error-message {
+  color: #b42318;
+  background: #fef3f2;
+  border: 1px solid #f4b9b4;
+}
+
+/* ---------- Link quay về Dashboard ---------- */
+
+.admin-applications > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-muted, #5b6776);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.admin-applications > a::before {
+  content: "\2190";
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.admin-applications > a:hover {
+  color: var(--color-brand, #0e6b5c);
+}
+
+.admin-applications > a:focus-visible {
+  outline: 3px solid rgba(14, 107, 92, 0.35);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ---------- Thanh tìm kiếm / lọc: form tìm kiếm + ô chọn ---------- */
+
+.admin-application-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1px solid var(--color-border, #e3e8ee);
+  border-radius: 12px;
+}
+
+/* Form tìm kiếm chiếm phần rộng, input giãn còn nút giữ nguyên */
+.admin-application-filters form {
+  display: flex;
+  flex: 1 1 320px;
+  gap: 10px;
+  min-width: 0;
+}
+
+.admin-application-filters input,
+.admin-application-filters select {
+  height: 42px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  color: var(--color-text, #1f2a37);
+  background-color: #ffffff;
+  border: 1.5px solid var(--color-border, #e3e8ee);
+  border-radius: 8px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.admin-application-filters input {
+  flex: 1;
+  min-width: 0;
+  padding: 0 14px;
+}
+
+.admin-application-filters input::placeholder {
+  color: #8a94a3;
+}
+
+.admin-application-filters select {
+  min-width: 170px;
+  padding: 0 40px 0 14px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%235b6776' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  appearance: none;
+  cursor: pointer;
+}
+
+.admin-application-filters input:hover,
+.admin-application-filters select:hover {
+  border-color: #c9d1da;
+}
+
+.admin-application-filters input:focus,
+.admin-application-filters select:focus {
+  outline: none;
+  border-color: var(--color-brand, #0e6b5c);
+  box-shadow: 0 0 0 3px rgba(14, 107, 92, 0.15);
+}
+
+/* Nút "Tìm kiếm" */
+.admin-application-filters button {
+  flex: none;
+  height: 42px;
+  padding: 0 22px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--color-brand, #0e6b5c);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.admin-application-filters button:hover {
+  background: var(--color-brand-dark, #0a5247);
+}
+
+.admin-application-filters button:focus-visible {
+  outline: 3px solid rgba(14, 107, 92, 0.35);
+  outline-offset: 2px;
+}
+
+/* ---------- Khung chứa bảng ---------- */
+
+.admin-application-list {
+  overflow-x: auto; /* màn hình hẹp thì bảng cuộn ngang trong khung */
+  background: #ffffff;
+  border: 1px solid var(--color-border, #e3e8ee);
+  border-radius: 12px;
+}
+
+.admin-application-list table {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.admin-application-list th {
+  padding: 12px 16px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: left;
+  white-space: nowrap;
+  color: var(--color-muted, #5b6776);
+  background: var(--color-page, #f6f8fa);
+  border-bottom: 1px solid var(--color-border, #e3e8ee);
+}
+
+.admin-application-list td {
+  padding: 13px 16px;
+  vertical-align: middle;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  border-top: 1px solid var(--color-border, #e3e8ee);
+}
+
+.admin-application-list tbody tr:first-child td {
+  border-top: none;
+}
+
+.admin-application-list tbody tr:hover {
+  background: #fafbfc;
+}
+
+/* Cột ID: nhỏ, màu nhạt */
+.admin-application-list th:first-child,
+.admin-application-list td:first-child {
+  width: 80px;
+  padding-left: 22px;
+}
+
+.admin-application-list td:first-child {
+  color: var(--color-muted, #5b6776);
+}
+
+/* Ứng viên / tin tuyển dụng: tên đậm, email hoặc công ty nhạt bên dưới */
+.admin-application-list td strong {
+  font-weight: 600;
+}
+
+.admin-application-list td p {
+  margin: 2px 0 0;
+  font-size: 0.84rem;
+  color: var(--color-muted, #5b6776);
+}
+
+/* Cột "Trạng thái ẩn": nhãn "Đã bị xóa" + nút Khôi phục */
+.admin-application-list td span {
+  display: inline-block;
+  margin-right: 10px;
+  padding: 3px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #b42318;
+  background: #fef3f2;
+  border-radius: 999px;
+}
+
+.admin-application-list td button {
+  padding: 5px 14px;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--color-brand, #0e6b5c);
+  background: transparent;
+  border: 1.5px solid var(--color-brand, #0e6b5c);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.admin-application-list td button:hover {
+  background: var(--color-brand-soft, #e6f2ef);
+}
+
+.admin-application-list td button:focus-visible {
+  outline: 3px solid rgba(14, 107, 92, 0.35);
+  outline-offset: 2px;
+}
+
+/* ---------- Phân trang ---------- */
+
+.admin-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin-top: 24px;
+}
+
+.admin-pagination button {
+  height: 38px;
+  padding: 0 18px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-brand, #0e6b5c);
+  background: #ffffff;
+  border: 1.5px solid var(--color-brand, #0e6b5c);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.admin-pagination button:hover:not(:disabled) {
+  color: #ffffff;
+  background: var(--color-brand, #0e6b5c);
+}
+
+.admin-pagination button:disabled {
+  color: var(--color-muted, #5b6776);
+  border-color: var(--color-border, #e3e8ee);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-pagination button:focus-visible {
+  outline: 3px solid rgba(14, 107, 92, 0.35);
+  outline-offset: 2px;
+}
+
+.admin-pagination span {
+  font-size: 0.9rem;
+  color: var(--color-muted, #5b6776);
+}
+
+@media (max-width: 600px) {
+  .admin-application-filters form,
+  .admin-application-filters select {
+    flex: 1 1 100%;
+  }
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 640px) {
+  .admin-applications {
+    margin: 16px auto 40px;
+    padding: 0 16px;
+  }
+
+  .admin-applications h1 {
+    font-size: 1.4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-applications > a,
+  .admin-application-filters input,
+  .admin-application-filters select,
+  .admin-application-filters button,
+  .admin-application-list td button,
+  .admin-pagination button {
+    transition: none;
+  }
+}

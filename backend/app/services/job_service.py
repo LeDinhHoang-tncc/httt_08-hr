@@ -315,3 +315,54 @@ def get_viewable_job_by_id(
         return job
 
     return None
+
+def search_deleted_jobs(
+    db: Session,
+    keyword: str | None = None,
+    page: int = 1,
+    page_size: int = 10,
+) -> tuple[list[Job], int]:
+    """Admin xem danh sách tin tuyển dụng đã xóa mềm."""
+
+    query = select(Job).where(Job.deleted_at.is_not(None))
+
+    if keyword:
+        pattern = f"%{keyword.strip()}%"
+        query = query.where(
+            or_(
+                Job.title.ilike(pattern),
+                Job.company_name.ilike(pattern),
+            )
+        )
+
+    total = db.scalar(
+        select(func.count()).select_from(query.order_by(None).subquery())
+    ) or 0
+
+    query = (
+        query.order_by(Job.deleted_at.desc(), Job.id.desc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+    )
+
+    jobs = list(db.scalars(query).all())
+
+    return jobs, total
+
+
+def restore_deleted_job(db: Session, job: Job) -> Job:
+    """Admin khôi phục tin tuyển dụng đã xóa mềm."""
+
+    if job.deleted_at is None:
+        raise ValueError("Tin tuyển dụng chưa bị xóa.")
+
+    job.deleted_at = None
+
+    try:
+        db.commit()
+        db.refresh(job)
+    except Exception:
+        db.rollback()
+        raise
+
+    return job

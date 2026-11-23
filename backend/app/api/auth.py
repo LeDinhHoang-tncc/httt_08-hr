@@ -11,7 +11,7 @@ from app.schemas.user import (
     UserRegister,
     UserResponse,
 )
-from app.services.auth_service import login_user, register_user
+from app.services.auth_service import login_user, register_user, request_recruiter_access
 
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
@@ -86,3 +86,19 @@ def get_me(
     current_user: User = Depends(get_current_user),
 ):
     return current_user
+
+@router.post("/recruiter-request", response_model=UserResponse)
+def submit_recruiter_request(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        return request_recruiter_access(
+            db=db,
+            user=current_user,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(exc),
+        )

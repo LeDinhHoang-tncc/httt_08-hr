@@ -1,0 +1,266 @@
+/* Dùng các biến màu khai báo trong Header.css */
+
+.admin-jobs {
+  width: 100%;
+  max-width: 1200px;
+  margin: 32px auto 56px; /* footer tự dính đáy nhờ margin-top:auto */
+  padding: 0 24px;
+  color: var(--color-text, #1f2a37);
+}
+
+.admin-jobs h1 {
+  margin: 0 0 8px;
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+/* Thông báo đang tải / lỗi / không có dữ liệu (chữ trần nằm trong trang) */
+.admin-jobs > p {
+  margin: 0 0 20px;
+  padding: 16px 22px;
+  color: var(--color-muted, #5b6776);
+  background: #ffffff;
+  border: 1px dashed var(--color-border, #e3e8ee);
+  border-radius: 10px;
+}
+
+.admin-jobs > p.error-message {
+  color: #b42318;
+  background: #fef3f2;
+  border: 1px solid #f4b9b4;
+}
+
+/* ---------- Link quay về Dashboard ---------- */
+
+.admin-jobs .btn-back-dashboard {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-muted, #5b6776);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.admin-jobs .btn-back-dashboard:hover {
+  color: var(--color-brand, #0e6b5c);
+}
+
+.admin-jobs .btn-back-dashboard:focus-visible {
+  outline: 3px solid rgba(14, 107, 92, 0.35);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ---------- Thanh tìm kiếm / lọc ---------- */
+
+.admin-job-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1px solid var(--color-border, #e3e8ee);
+  border-radius: 12px;
+}
+
+.admin-job-filters input,
+.admin-job-filters select {
+  height: 42px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  color: var(--color-text, #1f2a37);
+  background-color: #ffffff;
+  border: 1.5px solid var(--color-border, #e3e8ee);
+  border-radius: 8px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.admin-job-filters input {
+  flex: 1 1 240px;
+  min-width: 0;
+  padding: 0 14px;
+}
+
+.admin-job-filters input::placeholder {
+  color: #8a94a3;
+}
+
+.admin-job-filters select {
+  min-width: 170px;
+  padding: 0 40px 0 14px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%235b6776' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  appearance: none;
+  cursor: pointer;
+}
+
+.admin-job-filters input:hover,
+.admin-job-filters select:hover {
+  border-color: #c9d1da;
+}
+
+.admin-job-filters input:focus,
+.admin-job-filters select:focus {
+  outline: none;
+  border-color: var(--color-brand, #0e6b5c);
+  box-shadow: 0 0 0 3px rgba(14, 107, 92, 0.15);
+}
+
+/* Nút "Tìm kiếm" */
+.admin-job-filters button {
+  height: 42px;
+  padding: 0 22px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--color-brand, #0e6b5c);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.admin-job-filters button:hover {
+  background: var(--color-brand-dark, #0a5247);
+}
+
+.admin-job-filters button:focus-visible {
+  outline: 3px solid rgba(14, 107, 92, 0.35);
+  outline-offset: 2px;
+}
+
+/* ---------- Bảng ---------- */
+
+.admin-jobs > table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  font-size: 0.9rem;
+  background: #ffffff;
+  border: 1px solid var(--color-border, #e3e8ee);
+  border-radius: 12px;
+}
+
+.admin-jobs > table th {
+  padding: 12px 16px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: left;
+  white-space: nowrap;
+  color: var(--color-muted, #5b6776);
+  background: var(--color-page, #f6f8fa);
+  border-bottom: 1px solid var(--color-border, #e3e8ee);
+}
+
+.admin-jobs > table td {
+  padding: 13px 16px;
+  vertical-align: middle;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  border-bottom: 1px solid var(--color-border, #e3e8ee);
+}
+
+.admin-jobs > table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-jobs > table tbody tr:hover {
+  background: #fafbfc;
+}
+
+/* Cột ID: nhỏ, màu nhạt */
+.admin-jobs > table th:first-child,
+.admin-jobs > table td:first-child {
+  width: 60px;
+  padding-left: 22px;
+}
+
+.admin-jobs > table td:first-child {
+  color: var(--color-muted, #5b6776);
+}
+
+/* Cột cuối chứa nút: không xuống dòng */
+.admin-jobs > table td:last-child {
+  white-space: nowrap;
+}
+
+/* Tiêu đề "Thao tác" chưa có ô dữ liệu tương ứng trong file tsx
+   (7 tiêu đề, 6 ô mỗi hàng) nên ẩn đi để bảng không bị lệch cột.
+   Khi thêm cột Thao tác vào tsx thì xóa quy tắc này. */
+.admin-jobs > table th:last-child {
+  display: none;
+}
+
+/* Nút "Ẩn tin" / "Hiện tin": viền trung tính, rê chuột thì sang xanh */
+.admin-jobs > table td button {
+  padding: 6px 14px;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--color-text, #1f2a37);
+  background: #ffffff;
+  border: 1.5px solid var(--color-border, #e3e8ee);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.admin-jobs > table td button:hover {
+  color: var(--color-brand, #0e6b5c);
+  background: var(--color-brand-soft, #e6f2ef);
+  border-color: var(--color-brand, #0e6b5c);
+}
+
+.admin-jobs > table td button:focus-visible {
+  outline: 3px solid rgba(14, 107, 92, 0.35);
+  outline-offset: 2px;
+}
+
+/* Màn hình hẹp: bảng cuộn ngang thay vì làm vỡ trang */
+@media (max-width: 900px) {
+  .admin-jobs > table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .admin-job-filters select,
+  .admin-job-filters button {
+    flex: 1 1 100%;
+  }
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 640px) {
+  .admin-jobs {
+    margin: 16px auto 40px;
+    padding: 0 16px;
+  }
+
+  .admin-jobs h1 {
+    font-size: 1.4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-jobs .btn-back-dashboard,
+  .admin-job-filters input,
+  .admin-job-filters select,
+  .admin-job-filters button,
+  .admin-jobs > table td button {
+    transition: none;
+  }
+}

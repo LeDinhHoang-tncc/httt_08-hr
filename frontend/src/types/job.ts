@@ -9,6 +9,8 @@ export interface Job {
   salary_min: string | null;
   salary_max: string | null;
   status: string;
+  is_hidden: boolean;
+  created_by: number;
   created_at: string;
   updated_at: string;
 }

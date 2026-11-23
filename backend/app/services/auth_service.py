@@ -11,7 +11,7 @@ from app.schemas.user import UserRegister
 
 
 def register_user(db: Session, data: UserRegister) -> User:
-    """Đăng ký tài khoản ứng viên mới."""
+    """Đăng ký tài khoản Candidate hoặc yêu cầu quyền Recruiter."""
 
     email = str(data.email).strip().lower()
 
@@ -22,11 +22,20 @@ def register_user(db: Session, data: UserRegister) -> User:
     if existing_user:
         raise ValueError("Email đã được sử dụng.")
 
+    # Tất cả tài khoản đăng ký mới đều bắt đầu với role candidate.
+    # Nếu yêu cầu Recruiter thì chuyển trạng thái sang pending.
+    recruiter_status = (
+        "pending"
+        if data.requested_role == "recruiter"
+        else "not_requested"
+    )
+
     user = User(
         email=email,
         full_name=data.full_name.strip(),
         hashed_password=hash_password(data.password),
         role="candidate",
+        recruiter_status=recruiter_status,
     )
 
     try:
@@ -65,3 +74,23 @@ def login_user(
     token = create_access_token(user.id)
 
     return user, token
+
+def request_recruiter_access(db: Session, user: User) -> User:
+    """Gửi hoặc gửi lại yêu cầu trở thành Recruiter."""
+
+    if user.role != "candidate":
+        raise ValueError("Chỉ tài khoản Candidate mới được gửi yêu cầu.")
+
+    if user.recruiter_status not in {"not_requested", "rejected"}:
+        raise ValueError("Yêu cầu Recruiter đã được gửi hoặc đã được duyệt.")
+
+    user.recruiter_status = "pending"
+
+    try:
+        db.commit()
+        db.refresh(user)
+    except Exception:
+        db.rollback()
+        raise
+
+    return user

@@ -15,6 +15,18 @@ import ProtectedRoute from "./components/common/ProtectedRoute";
 import CandidateApplicationDetail from "./pages/candidate/CandidateApplicationDetail";
 import CandidateDashboard from "./pages/candidate/CandidateDashboard";
 
+import RecruiterDashboard from "./pages/recruiter/RecruiterDashboard";
+import CreateJob from "./pages/recruiter/CreateJob";
+import EditJob from "./pages/recruiter/EditJob";
+import RecruiterApplications from "./pages/recruiter/RecruiterApplications";
+import RecruiterApplicationDetail from "./pages/recruiter/RecruiterApplicationDetail";
+
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminRecruiterRequests from "./pages/admin/AdminRecruiterRequests";
+import AdminJobs from "./pages/admin/AdminJobs";
+import AdminDeletedJobs from "./pages/admin/AdminDeletedJobs";
+import AdminApplications from "./pages/admin/AdminApplications";
 
 interface Job {
   id: number;
@@ -237,14 +249,31 @@ function App() {
         element={<CandidateApplicationDetail />}
       />
     </Route>
+    {/* Các trang dành cho nhà tuyển dụng */}
+    <Route element={<ProtectedRoute allowedRoles={["recruiter"]} />}>
+      <Route path="/recruiter/dashboard" element={<RecruiterDashboard />}/>
+      <Route path="/recruiter/jobs/create" element={<CreateJob />}/>
+      <Route path="/recruiter/jobs/:jobId/edit" element={<EditJob />}/>
+      <Route path="/recruiter/jobs/:jobId/applications" element={<RecruiterApplications />}/>
+      <Route path="/recruiter/jobs/:jobId/applications/:applicationId" element={<RecruiterApplicationDetail />}/>
+    </Route>
+    {/* Các trang dành cho Admin */}
+    <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+      <Route path="/admin/dashboard" element={<AdminDashboard />}/>
+      <Route path="/admin/users" element={<AdminUsers />}/>
+      <Route path="/admin/recruiter-requests" element={<AdminRecruiterRequests />}/>
+      <Route path="/admin/jobs" element={<AdminJobs />} />
+      <Route path="/admin/deleted-jobs" element={<AdminDeletedJobs />}/>
+      <Route path="/admin/applications" element={<AdminApplications />}/>
+    </Route>
   </Route>
 
   {/* Layout xác thực */}
   <Route element={<AuthLayout />}>
     <Route path="/login" element={<Login />} />
     <Route path="/register" element={<Register />} />
-  </Route>
-</Routes>
+    </Route>
+  </Routes>
   );
 }
 

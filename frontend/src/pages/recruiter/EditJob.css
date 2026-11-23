@@ -1,0 +1,260 @@
+/* Dùng các biến màu khai báo trong Header.css */
+
+/* ---------- Thẻ chỉnh sửa tin tuyển dụng ---------- */
+
+.edit-job-page {
+  width: 100%;
+  max-width: 760px;
+  margin: 32px auto 56px; /* footer tự dính đáy nhờ margin-top:auto */
+  padding: 36px 44px 40px;
+  background: #ffffff;
+  border: 1px solid var(--color-border, #e3e8ee);
+  border-radius: 14px;
+  color: var(--color-text, #1f2a37);
+}
+
+.edit-job-page h1 {
+  margin: 0 0 24px;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+/* ---------- Form: lưới 2 cột ---------- */
+
+.edit-job-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 20px;
+}
+
+.edit-job-form > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* Tiêu đề, công ty, mô tả, yêu cầu, trạng thái, lỗi, nút: chiếm cả hàng.
+   Địa điểm | loại hình và lương tối thiểu | tối đa: mỗi hàng 2 ô. */
+.edit-job-form > div:nth-child(-n + 4),
+.edit-job-form > div:nth-child(9),
+.edit-job-form > .error-message,
+.edit-job-form > .edit-job-actions {
+  grid-column: 1 / -1;
+}
+
+.edit-job-form label {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--color-text, #1f2a37);
+}
+
+.edit-job-form input,
+.edit-job-form select,
+.edit-job-form textarea {
+  width: 100%;
+  padding: 0 14px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--color-text, #1f2a37);
+  background: #ffffff;
+  border: 1.5px solid var(--color-border, #e3e8ee);
+  border-radius: 8px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.edit-job-form input,
+.edit-job-form select {
+  height: 46px;
+}
+
+.edit-job-form textarea {
+  min-height: 150px;
+  padding: 12px 14px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+/* Ô chọn có mũi tên riêng cho đồng bộ giữa các trình duyệt */
+.edit-job-form select {
+  padding-right: 40px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%235b6776' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  cursor: pointer;
+}
+
+.edit-job-form input:hover,
+.edit-job-form select:hover:not(:disabled),
+.edit-job-form textarea:hover {
+  border-color: #c9d1da;
+}
+
+.edit-job-form input:focus,
+.edit-job-form select:focus,
+.edit-job-form textarea:focus {
+  outline: none;
+  border-color: var(--color-brand, #0e6b5c);
+  box-shadow: 0 0 0 3px rgba(14, 107, 92, 0.15);
+}
+
+.edit-job-form select:disabled {
+  color: var(--color-muted, #5b6776);
+  background-color: var(--color-page, #f6f8fa);
+  cursor: not-allowed;
+}
+
+/* Dòng ghi chú dưới ô (ví dụ: tin đã kết thúc không đổi được trạng thái) */
+.edit-job-form > div p {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--color-muted, #5b6776);
+}
+
+/* ---------- Thông báo lỗi ---------- */
+
+.edit-job-form .error-message,
+.edit-job-page > .error-message {
+  margin: 0;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #b42318;
+  background: #fef3f2;
+  border: 1px solid #f4b9b4;
+  border-radius: 8px;
+}
+
+/* ---------- Nút ---------- */
+
+.edit-job-form > .edit-job-actions {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border, #e3e8ee);
+}
+
+.edit-job-actions button {
+  height: 46px;
+  padding: 0 26px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--color-brand, #0e6b5c);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.edit-job-actions button:hover:not(:disabled) {
+  background: var(--color-brand-dark, #0a5247);
+}
+
+.edit-job-actions button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Link "Quay lại": nút viền */
+.edit-job-actions a {
+  display: inline-flex;
+  align-items: center;
+  height: 46px;
+  padding: 0 22px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-muted, #5b6776);
+  text-decoration: none;
+  border: 1.5px solid var(--color-border, #e3e8ee);
+  border-radius: 8px;
+  transition: color 0.15s ease, border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.edit-job-actions a:hover {
+  color: var(--color-brand, #0e6b5c);
+  background: var(--color-brand-soft, #e6f2ef);
+  border-color: var(--color-brand, #0e6b5c);
+}
+
+.edit-job-actions button:focus-visible,
+.edit-job-actions a:focus-visible,
+.edit-job-page > a:focus-visible {
+  outline: 3px solid rgba(14, 107, 92, 0.35);
+  outline-offset: 2px;
+}
+
+/* ---------- Trạng thái lỗi tải trang (chỉ có chữ lỗi + link) ---------- */
+
+.edit-job-page > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-muted, #5b6776);
+  text-decoration: none;
+}
+
+.edit-job-page > a::before {
+  content: "\2190";
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.edit-job-page > a:hover {
+  color: var(--color-brand, #0e6b5c);
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 640px) {
+  .edit-job-page {
+    width: auto;
+    margin: 16px 12px 40px;
+    padding: 24px 20px 28px;
+    border-radius: 12px;
+  }
+
+  /* Một cột, mọi ô xếp dọc */
+  .edit-job-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .edit-job-form > div:nth-child(-n + 4),
+  .edit-job-form > div:nth-child(9),
+  .edit-job-form > .error-message,
+  .edit-job-form > .edit-job-actions {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .edit-job-form > .edit-job-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .edit-job-actions a {
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .edit-job-form input,
+  .edit-job-form select,
+  .edit-job-form textarea,
+  .edit-job-actions button,
+  .edit-job-actions a {
+    transition: none;
+  }
+}

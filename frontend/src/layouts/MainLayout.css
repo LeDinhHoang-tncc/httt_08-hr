@@ -1,3 +1,16 @@
+/* ---------- Khung chung của mọi trang (Header + nội dung + Footer) ----------
+   Footer nằm trực tiếp trong .main-layout nên khung flex dọc phải đặt ở đây.
+   Nhờ vậy khi nội dung ngắn, margin-top:auto của footer đẩy nó xuống đáy màn hình. */
+
+.main-layout {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh; /* tránh lệch chiều cao trên trình duyệt điện thoại */
+  display: flex;
+  flex-direction: column;
+}
+
+
 /* ---------- Thiết lập chung ---------- */
 
 /* Các biến màu (--color-brand, ...) được khai báo trong Header.css */

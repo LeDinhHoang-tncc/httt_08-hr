@@ -1,0 +1,180 @@
+/* Dùng các biến màu khai báo trong Header.css */
+
+.confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100; /* cao hơn header và các hộp (modal) khác */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(15, 25, 35, 0.5);
+  animation: confirm-fade 0.18s ease both;
+}
+
+.confirm-box {
+  width: 100%;
+  max-width: 400px;
+  padding: 28px 28px 24px;
+  text-align: center;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(15, 25, 35, 0.25);
+  animation: confirm-pop 0.22s ease both;
+}
+
+/* Biểu tượng tròn phía trên */
+.confirm-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 16px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  border-radius: 50%;
+}
+
+.confirm-icon::before {
+  content: "?";
+}
+
+.confirm-box--default .confirm-icon {
+  color: var(--color-brand, #0e6b5c);
+  background: var(--color-brand-soft, #e6f2ef);
+}
+
+.confirm-box--danger .confirm-icon {
+  color: #b42318;
+  background: #fef3f2;
+}
+
+.confirm-box--danger .confirm-icon::before {
+  content: "!";
+}
+
+.confirm-box h3 {
+  margin: 0 0 8px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  color: var(--color-text, #1f2a37);
+}
+
+.confirm-box p {
+  margin: 0 0 24px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--color-muted, #5b6776);
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Nút ---------- */
+
+.confirm-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.confirm-actions button {
+  flex: 1;
+  height: 44px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.confirm-cancel {
+  color: var(--color-muted, #5b6776);
+  background: #ffffff;
+  border: 1.5px solid var(--color-border, #e3e8ee);
+}
+
+.confirm-cancel:hover:not(:disabled) {
+  color: var(--color-text, #1f2a37);
+  background: var(--color-page, #f6f8fa);
+  border-color: #c9d1da;
+}
+
+.confirm-ok {
+  color: #ffffff;
+  border: 1.5px solid transparent;
+}
+
+.confirm-box--default .confirm-ok {
+  background: var(--color-brand, #0e6b5c);
+}
+
+.confirm-box--default .confirm-ok:hover:not(:disabled) {
+  background: var(--color-brand-dark, #0a5247);
+}
+
+.confirm-box--danger .confirm-ok {
+  background: #d92d20;
+}
+
+.confirm-box--danger .confirm-ok:hover:not(:disabled) {
+  background: #b42318;
+}
+
+.confirm-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.confirm-actions button:focus-visible {
+  outline: 3px solid rgba(14, 107, 92, 0.4);
+  outline-offset: 2px;
+}
+
+.confirm-box--danger .confirm-ok:focus-visible {
+  outline-color: rgba(180, 35, 24, 0.4);
+}
+
+@keyframes confirm-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes confirm-pop {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .confirm-box {
+    padding: 24px 20px 20px;
+  }
+
+  .confirm-actions {
+    flex-direction: column-reverse;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confirm-backdrop,
+  .confirm-box {
+    animation: none;
+  }
+
+  .confirm-actions button {
+    transition: none;
+  }
+}

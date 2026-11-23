@@ -34,6 +34,13 @@ class User(Base):
         nullable=False,
     )
 
+    recruiter_status: Mapped[str] = mapped_column(
+        String(20),
+        default="not_requested",
+        server_default="not_requested",
+        nullable=False,
+    )
+
     is_active: Mapped[bool] = mapped_column(
         Boolean,
         default=True,

@@ -79,6 +79,55 @@ def search_managed_jobs(
     )
     return jobs
 
+
+@router.get("/admin/deleted", response_model=list[JobResponse])
+def search_deleted_jobs(
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(require_admin)],
+    keyword: str | None = None,
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=10, ge=1, le=100),
+):
+    """Admin xem danh sách tin tuyển dụng đã xóa mềm."""
+
+    jobs, _ = job_service.search_deleted_jobs(
+        db=db,
+        keyword=keyword,
+        page=page,
+        page_size=page_size,
+    )
+
+    return jobs
+
+
+@router.patch(
+    "/admin/{job_id}/restore",
+    response_model=JobResponse,
+)
+def restore_deleted_job(
+    job_id: int,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(require_admin)],
+):
+    """Admin khôi phục tin tuyển dụng đã xóa mềm."""
+
+    job = job_service.get_job_by_id(db, job_id)
+
+    if job is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Không tìm thấy tin tuyển dụng.",
+        )
+
+    try:
+        return job_service.restore_deleted_job(db, job)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(exc),
+        )
+
+
 @router.get("/{job_id}", response_model=JobResponse)
 def get_job(
     job_id: int,

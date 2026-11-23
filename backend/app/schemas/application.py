@@ -45,6 +45,21 @@ class ApplicationResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
+class AdminApplicationResponse(BaseModel):
+    id: int
+    user_id: int
+    job_id: int
+    status: ApplicationStatus
+    hidden_by_candidate: bool
+
+    candidate_name: str
+    candidate_email: str
+
+    job_title: str
+    company_name: str
+
+    created_at: datetime
+
 class CandidateSummary(BaseModel):
     full_name: str
     email: str
@@ -68,6 +83,12 @@ class ReceivedApplicationListResponse(BaseModel):
 
 class ApplicationListResponse(BaseModel):
     items: list[ApplicationResponse]
+    total: int
+    page: int
+    page_size: int
+
+class AdminApplicationListResponse(BaseModel):
+    items: list[AdminApplicationResponse]
     total: int
     page: int
     page_size: int

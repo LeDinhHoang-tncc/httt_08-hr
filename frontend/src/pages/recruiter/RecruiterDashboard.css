@@ -1,0 +1,444 @@
+/* Dùng các biến màu khai báo trong Header.css */
+
+.recruiter-dashboard {
+  width: 100%;
+  max-width: 1100px;
+  margin: 32px auto 56px; /* footer tự dính đáy nhờ margin-top:auto */
+  padding: 0 24px;
+  color: var(--color-text, #1f2a37);
+}
+
+/* ---------- Khối chào nhà tuyển dụng ---------- */
+
+.recruiter-info {
+  margin-bottom: 40px;
+  padding: 28px 32px;
+  background: var(--color-brand, #0e6b5c);
+  border-radius: 14px;
+  color: #ffffff;
+}
+
+.recruiter-info h1 {
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.recruiter-info p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Dòng "Xin chào, tên bạn!" */
+.recruiter-info p:first-of-type {
+  font-size: clamp(1.3rem, 3vw, 1.7rem);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+/* Dòng email */
+.recruiter-info p:last-of-type:not(:first-of-type) {
+  margin-top: 6px;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ---------- Đầu khối: tiêu đề bên trái, nút đăng tin bên phải ---------- */
+
+.recruiter-jobs {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 16px;
+}
+
+.recruiter-jobs > * {
+  grid-column: 1 / -1;
+}
+
+.recruiter-jobs > h2 {
+  grid-column: 1;
+  margin: 0 0 20px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.recruiter-jobs > .recruiter-actions {
+  grid-column: 2;
+  margin-bottom: 20px;
+}
+
+/* Nút "+ Đăng tin tuyển dụng" */
+.recruiter-actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 18px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #ffffff;
+  text-decoration: none;
+  white-space: nowrap;
+  background: var(--color-brand, #0e6b5c);
+  border-radius: 8px;
+  transition: background-color 0.15s ease;
+}
+
+.recruiter-actions a::before {
+  content: "+";
+  font-size: 1.2rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.recruiter-actions a:hover {
+  background: var(--color-brand-dark, #0a5247);
+}
+
+/* Thông báo đang tải / chưa có tin */
+.recruiter-jobs > p {
+  margin: 0 0 20px;
+  padding: 20px 24px;
+  color: var(--color-muted, #5b6776);
+  background: #ffffff;
+  border: 1px dashed var(--color-border, #e3e8ee);
+  border-radius: 10px;
+}
+
+/* Thông báo lỗi */
+.recruiter-dashboard .error-message {
+  color: #b42318;
+  background: #fef3f2;
+  border: 1px solid #f4b9b4;
+  border-style: solid;
+}
+
+/* ---------- Danh sách: mỗi tin là một hàng rộng, thoáng ---------- */
+
+.recruiter-job-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.recruiter-job-item {
+  padding: 20px 24px;
+  background: #ffffff;
+  border: 1px solid var(--color-border, #e3e8ee);
+  border-radius: 12px;
+  transition: border-color 0.15s ease;
+}
+
+.recruiter-job-item:hover {
+  border-color: var(--color-brand, #0e6b5c);
+}
+
+/* Dòng đầu: tên tin + nhãn trạng thái */
+.job-item-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px 16px;
+}
+
+.job-item-head h3 {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--color-brand, #0e6b5c);
+  overflow-wrap: anywhere;
+}
+
+/* Nhãn trạng thái */
+.job-status {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #4b5563;
+  background: #f1f3f5;
+  border-radius: 999px;
+}
+
+.job-status::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  background: currentColor;
+  border-radius: 50%;
+}
+
+/* Đang tuyển dụng */
+.job-status--published {
+  color: var(--color-brand-dark, #0a5247);
+  background: var(--color-brand-soft, #e6f2ef);
+}
+
+/* Đã kết thúc */
+.job-status--completed {
+  color: #4338ca;
+  background: #eef2ff;
+}
+
+/* Thông tin: công ty, địa điểm, ngày tạo trên cùng một hàng */
+.job-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 24px;
+  margin: 14px 0 0;
+}
+
+.job-meta dt {
+  margin: 0 0 2px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--color-muted, #5b6776);
+}
+
+.job-meta dd {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Cảnh báo: tin đang bị Admin ẩn ---------- */
+
+.recruiter-job-item p.job-hidden-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #92400e;
+  background: #fffbeb;
+  border: 1px solid #f5d78e;
+  border-left: 4px solid #d97706;
+  border-radius: 8px;
+}
+
+/* Biểu tượng "!" trong vòng tròn cam */
+.recruiter-job-item p.job-hidden-warning::before {
+  content: "!";
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+  background: #d97706;
+  border-radius: 50%;
+}
+
+/* Cả thẻ có viền cam nhạt để dễ nhận ra giữa danh sách */
+.recruiter-job-item:has(.job-hidden-warning) {
+  border-color: #f5d78e;
+}
+
+.recruiter-job-item:has(.job-hidden-warning):hover {
+  border-color: #d97706;
+}
+
+/* ---------- Hàng nút: nhóm chính bên trái, nhóm nguy hiểm bên phải ---------- */
+
+.job-item-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border, #e3e8ee);
+}
+
+.job-actions-main,
+.job-actions-danger {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.btn-job-primary,
+.btn-job-secondary,
+.btn-job-complete,
+.btn-job-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  padding: 0 16px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+/* "Xem đơn ứng tuyển": hành động chính */
+.btn-job-primary {
+  color: #ffffff;
+  background: var(--color-brand, #0e6b5c);
+  border: 1.5px solid var(--color-brand, #0e6b5c);
+}
+
+.btn-job-primary:hover {
+  background: var(--color-brand-dark, #0a5247);
+  border-color: var(--color-brand-dark, #0a5247);
+}
+
+/* "Chỉnh sửa": viền xanh */
+.btn-job-secondary {
+  color: var(--color-brand, #0e6b5c);
+  background: transparent;
+  border: 1.5px solid var(--color-brand, #0e6b5c);
+}
+
+.btn-job-secondary:hover {
+  background: var(--color-brand-soft, #e6f2ef);
+}
+
+/* "Kết thúc tuyển dụng": viền xám trung tính */
+.btn-job-complete {
+  color: var(--color-muted, #5b6776);
+  background: transparent;
+  border: 1.5px solid var(--color-border, #e3e8ee);
+}
+
+.btn-job-complete:hover:not(:disabled) {
+  color: var(--color-text, #1f2a37);
+  background: var(--color-page, #f6f8fa);
+  border-color: #c9d1da;
+}
+
+.btn-job-complete:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* "Xóa tin": chữ đỏ, không viền, nền đỏ nhạt khi rê chuột */
+.btn-job-delete {
+  color: #b42318;
+  background: transparent;
+  border: 1.5px solid transparent;
+}
+
+.btn-job-delete:hover {
+  background: #fef3f2;
+  border-color: #f4b9b4;
+}
+
+.recruiter-actions a:focus-visible,
+.btn-job-primary:focus-visible,
+.btn-job-secondary:focus-visible,
+.btn-job-complete:focus-visible {
+  outline: 3px solid rgba(14, 107, 92, 0.35);
+  outline-offset: 2px;
+}
+
+.btn-job-delete:focus-visible {
+  outline: 3px solid rgba(180, 35, 24, 0.3);
+  outline-offset: 2px;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 760px) {
+  .job-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .recruiter-dashboard {
+    margin: 16px auto 40px;
+    padding: 0 16px;
+  }
+
+  .recruiter-info {
+    margin-bottom: 28px;
+    padding: 22px 20px;
+    border-radius: 12px;
+  }
+
+  /* Tiêu đề và nút "Đăng tin" xuống hàng, nút rộng hết cỡ */
+  .recruiter-jobs > h2,
+  .recruiter-jobs > .recruiter-actions {
+    grid-column: 1 / -1;
+  }
+
+  .recruiter-jobs > h2 {
+    margin-bottom: 14px;
+  }
+
+  .recruiter-actions a {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .recruiter-job-item {
+    padding: 18px 16px;
+  }
+
+  .job-item-head {
+    flex-wrap: wrap-reverse; /* nhãn trạng thái lên trên tên tin */
+  }
+}
+
+@media (max-width: 520px) {
+  .job-meta {
+    grid-template-columns: 1fr;
+  }
+
+  /* Nút chính chiếm hết hàng, nút nguy hiểm nằm hàng dưới */
+  .job-actions-main,
+  .job-actions-danger {
+    flex: 1 1 100%;
+  }
+
+  .job-actions-main > * {
+    flex: 1 1 0;
+  }
+
+  .job-actions-danger {
+    justify-content: flex-end;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recruiter-actions a,
+  .recruiter-job-item,
+  .btn-job-primary,
+  .btn-job-secondary,
+  .btn-job-complete,
+  .btn-job-delete {
+    transition: none;
+  }
+}

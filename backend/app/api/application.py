@@ -25,6 +25,8 @@ from app.schemas.application import (
     ApplicationStatusUpdate,
     ReceivedApplicationResponse,
     ReceivedApplicationListResponse,
+    AdminApplicationResponse,
+    AdminApplicationListResponse,
 )
 from app.services import application_service, file_service
 from app.services.application_service import (
@@ -296,26 +298,16 @@ def search_received_applications(
     )
 
 # ---------------------------------------------------------------------------
-# Chi tiết + tải CV (candidate chủ hồ sơ hoặc recruiter chủ tin)
-# ---------------------------------------------------------------------------
-@router.get("/{application_id}", response_model=ApplicationResponse)
-def get_application(
-    application_id: int,
-    db: DbDep,
-    current_user: UserDep,
-):
-    return _get_viewable_application(db, application_id, current_user)
-
-
-# ---------------------------------------------------------------------------
 # Admin: xem tất cả hồ sơ, bao gồm hồ sơ đã ẩn
 # ---------------------------------------------------------------------------
-@router.get("/admin", response_model=ApplicationListResponse)
+@router.get("/admin", response_model=AdminApplicationListResponse)
 def search_all_applications(
     db: DbDep,
     current_user: UserDep,
     job_id: int | None = Query(default=None, gt=0),
     application_status: ApplicationStatusFilter | None = Query(default=None),
+    keyword: str | None = Query(default=None, min_length=1, max_length=100),
+    hidden_by_candidate: bool | None = Query(default=None),
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=10, ge=1, le=100),
 ):
@@ -329,11 +321,33 @@ def search_all_applications(
         db=db,
         job_id=job_id,
         application_status=application_status,
+        keyword=keyword,
+        hidden_by_candidate=hidden_by_candidate,
+        page=page,
+        page_size=page_size,
+    )
+    return AdminApplicationListResponse(
+        items=[
+            AdminApplicationResponse.model_validate(item)
+            for item in applications
+        ],
+        total=total,
         page=page,
         page_size=page_size,
     )
 
-    return _build_list_response(applications, total, page, page_size)
+# ---------------------------------------------------------------------------
+# Chi tiết + tải CV (candidate chủ hồ sơ hoặc recruiter chủ tin)
+# ---------------------------------------------------------------------------
+@router.get("/{application_id}", response_model=ApplicationResponse)
+def get_application(
+    application_id: int,
+    db: DbDep,
+    current_user: UserDep,
+):
+    return _get_viewable_application(db, application_id, current_user)
+
+
 
 @router.get("/{application_id}/cv")
 def download_application_cv(

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Select, func, select
+from sqlalchemy import Select, func, select, or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -11,6 +11,7 @@ from app.models.user import User
 from app.schemas.application import ApplicationCreate
 from app.services import job_service
 
+import unicodedata
 
 
 # ---------------------------------------------------------------------------
@@ -194,7 +195,6 @@ def search_applications(
         query = query.where(Application.job_id == job_id)
     if application_status is not None:
         query = query.where(Application.status == application_status)
-
     return _paginate(db, query, page, page_size)
 
 
@@ -243,23 +243,117 @@ def search_received_applications(
     return rows, total
 
 
+def get_submitted_applications_for_job(
+    db: Session,
+    job_id: int,
+) -> list[Application]:
+    """Lấy toàn bộ hồ sơ submitted chưa bị ứng viên ẩn của một tin tuyển dụng."""
+
+    query = (
+        select(Application)
+        .where(
+            Application.job_id == job_id,
+            Application.status == "submitted",
+            Application.hidden_by_candidate.is_(False),
+        )
+        .order_by(
+            Application.created_at.asc(),
+            Application.id.asc(),
+        )
+    )
+
+    return list(db.scalars(query).all())
+
+
+def normalize_text(value: str | None) -> str:
+    if not value:
+        return ""
+
+    value = value.lower().replace("đ", "d")
+
+    value = unicodedata.normalize("NFD", value)
+
+    return "".join(
+        char
+        for char in value
+        if unicodedata.category(char) != "Mn"
+    )
+
 def search_all_applications(
     db: Session,
     job_id: int | None = None,
     application_status: str | None = None,
+    keyword: str | None = None,
+    hidden_by_candidate: bool | None = None,
     page: int = 1,
     page_size: int = 10,
-) -> tuple[list[Application], int]:
+):
     """Admin xem tất cả hồ sơ, bao gồm cả hồ sơ đã bị ẩn."""
-    query = select(Application)
+
+    query = (
+        select(
+            Application.id,
+            Application.user_id,
+            Application.job_id,
+            Application.status,
+            Application.hidden_by_candidate,
+            User.full_name.label("candidate_name"),
+            User.email.label("candidate_email"),
+            Job.title.label("job_title"),
+            Job.company_name,
+            Application.created_at,
+        )
+        .join(User, Application.user_id == User.id)
+        .join(Job, Application.job_id == Job.id)
+    )
 
     if job_id is not None:
         query = query.where(Application.job_id == job_id)
 
     if application_status is not None:
         query = query.where(Application.status == application_status)
+    if hidden_by_candidate is not None:
+        query = query.where(
+            Application.hidden_by_candidate == hidden_by_candidate
+        )
+    if keyword:
+        search_term = normalize_text(keyword.strip())
 
-    return _paginate(db, query, page, page_size)
+        all_items = db.execute(query).mappings().all()
+
+        items = [
+            item
+            for item in all_items
+            if any(
+                search_term in normalize_text(value)
+                for value in [
+                    item["candidate_name"],
+                    item["candidate_email"],
+                    item["job_title"],
+                    item["company_name"],
+                ]
+            )
+        ]
+
+        total = len(items)
+
+        items = items[
+            (page - 1) * page_size : page * page_size
+        ]
+
+        return items, total
+    total = db.scalar(
+        select(func.count()).select_from(query.subquery())
+    ) or 0
+
+    items = db.execute(
+        query
+        .order_by(Application.created_at.desc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+    ).mappings().all()
+
+    return items, total
 
 # ---------------------------------------------------------------------------
 # Đổi trạng thái

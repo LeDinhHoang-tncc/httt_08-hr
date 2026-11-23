@@ -10,6 +10,7 @@ import {
   type Application,
 } from "../../services/applicationService";
 import type { Job } from "../../types/job";
+import ConfirmDialog from "../../components/common/ConfirmDialog";
 
 import "./CandidateApplicationDetail.css";
 
@@ -26,6 +27,8 @@ function CandidateApplicationDetail() {
   const [saving, setSaving] = useState(false);
   const [editError, setEditError] = useState("");
   const [editSuccess, setEditSuccess] = useState("");
+  const [showWithdrawConfirm, setShowWithdrawConfirm] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -128,7 +131,7 @@ function CandidateApplicationDetail() {
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      alert(
+      setAlertMessage(
         err instanceof Error ? err.message : "Không thể tải CV."
       );
     }
@@ -165,23 +168,22 @@ function CandidateApplicationDetail() {
   };
 
   const handleWithdrawApplication = async () => {
-    const confirmed = window.confirm(
-        "Bạn có chắc chắn muốn rút đơn ứng tuyển này không?"
-      );
-
-      if (!confirmed) return;
-
       try {
         const updatedApplication = await withdrawApplication(application.id);
         setApplication(updatedApplication);
         setEditSuccess("Đã rút đơn ứng tuyển thành công.");
       } catch (err) {
-        alert(
+        setAlertMessage(
           err instanceof Error ? err.message : "Không thể rút đơn ứng tuyển."
         );
       }
     };
 
+
+  const handleConfirmWithdraw = async () => {
+    setShowWithdrawConfirm(false);
+    await handleWithdrawApplication();
+  };
 
   const closeEditForm = () => {
     if (saving) return;
@@ -261,7 +263,7 @@ function CandidateApplicationDetail() {
             <button
               type="button"
               className="btn-danger"
-              onClick={handleWithdrawApplication}
+              onClick={() => setShowWithdrawConfirm(true)}
             >
               Rút đơn ứng tuyển
             </button>
@@ -366,6 +368,27 @@ function CandidateApplicationDetail() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={showWithdrawConfirm}
+        variant="danger"
+        title="Rút đơn ứng tuyển?"
+        message="Bạn có chắc chắn muốn rút đơn ứng tuyển này không?"
+        confirmText="Rút đơn"
+        onConfirm={handleConfirmWithdraw}
+        onCancel={() => setShowWithdrawConfirm(false)}
+      />
+
+      <ConfirmDialog
+        open={alertMessage !== ""}
+        variant="danger"
+        title="Có lỗi xảy ra"
+        message={alertMessage}
+        confirmText="Đóng"
+        showCancel={false}
+        onConfirm={() => setAlertMessage("")}
+        onCancel={() => setAlertMessage("")}
+      />
     </main>
   );
 }
