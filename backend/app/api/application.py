@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user, get_db
 from app.models.application import Application
+from app.models.job import Job
 from app.models.user import User
 from app.schemas.application import (
     ApplicationCreate,
@@ -27,8 +28,10 @@ from app.schemas.application import (
     ReceivedApplicationListResponse,
     AdminApplicationResponse,
     AdminApplicationListResponse,
+    BulkCVExtractionResponse,
+    ExtractedCVResult,
 )
-from app.services import application_service, file_service
+from app.services import application_service, file_service,  cv_service
 from app.services.application_service import (
     ApplicationError,
     ApplicationNotEditableError,
@@ -89,11 +92,7 @@ def _not_found() -> HTTPException:
     )
 
 
-def _get_viewable_application(
-    db: Session,
-    application_id: int,
-    user: User,
-) -> Application:
+def _get_viewable_application( db: Session, application_id: int, user: User,) -> Application:
     """
     Candidate: chỉ xem hồ sơ của mình và chưa bị ẩn.
     Recruiter: chỉ xem hồ sơ thuộc tin mình đăng và chưa bị ẩn.
@@ -130,12 +129,7 @@ def _get_viewable_application(
     return application
 
 
-def _build_list_response(
-    applications: list[Application],
-    total: int,
-    page: int,
-    page_size: int,
-) -> ApplicationListResponse:
+def _build_list_response( applications: list[Application], total: int, page: int, page_size: int,) -> ApplicationListResponse:
     return ApplicationListResponse(
         items=[ApplicationResponse.model_validate(a) for a in applications],
         total=total,
@@ -147,18 +141,8 @@ def _build_list_response(
 # ---------------------------------------------------------------------------
 # Candidate: nộp hồ sơ
 # ---------------------------------------------------------------------------
-@router.post(
-    "",
-    response_model=ApplicationResponse,
-    status_code=status.HTTP_201_CREATED,
-)
-async def create_application(
-    db: DbDep,
-    current_user: UserDep,
-    job_id: int = Form(..., gt=0),
-    cover_letter: str | None = Form(default=None, max_length=5000),
-    cv_file: UploadFile = File(...),
-):
+@router.post( "", response_model=ApplicationResponse, status_code=status.HTTP_201_CREATED,)
+async def create_application( db: DbDep, current_user: UserDep, job_id: int = Form(..., gt=0), cover_letter: str | None = Form(default=None, max_length=5000), cv_file: UploadFile = File(...),):
     if current_user.role != "candidate":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -218,14 +202,7 @@ async def create_application(
 # Candidate: danh sách hồ sơ của mình
 # ---------------------------------------------------------------------------
 @router.get("", response_model=ApplicationListResponse)
-def search_my_applications(
-    db: DbDep,
-    current_user: UserDep,
-    job_id: int | None = Query(default=None, gt=0),
-    application_status: ApplicationStatusFilter | None = Query(default=None),
-    page: int = Query(default=1, ge=1),
-    page_size: int = Query(default=10, ge=1, le=100),
-):
+def search_my_applications( db: DbDep, current_user: UserDep, job_id: int | None = Query(default=None, gt=0), application_status: ApplicationStatusFilter | None = Query(default=None), page: int = Query(default=1, ge=1), page_size: int = Query(default=10, ge=1, le=100),):
     applications, total = application_service.search_applications(
         db=db,
         user_id=current_user.id,
@@ -242,18 +219,8 @@ def search_my_applications(
 # LƯU Ý: phải khai báo TRƯỚC "/{application_id}", nếu không "received"
 # sẽ bị hiểu là application_id và trả 422.
 # ---------------------------------------------------------------------------
-@router.get(
-    "/received",
-    response_model=ReceivedApplicationListResponse,
-)
-def search_received_applications(
-    db: DbDep,
-    current_user: UserDep,
-    job_id: int | None = Query(default=None, gt=0),
-    application_status: ApplicationStatusFilter | None = Query(default=None),
-    page: int = Query(default=1, ge=1),
-    page_size: int = Query(default=10, ge=1, le=100),
-):
+@router.get( "/received", response_model=ReceivedApplicationListResponse,)
+def search_received_applications( db: DbDep, current_user: UserDep, job_id: int | None = Query(default=None, gt=0), application_status: ApplicationStatusFilter | None = Query(default=None), page: int = Query(default=1, ge=1), page_size: int = Query(default=10, ge=1, le=100),):
     if current_user.role != "recruiter":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -297,20 +264,97 @@ def search_received_applications(
         page_size=page_size,
     )
 
+
+# ---------------------------------------------------------------------------
+# Recruiter: đọc hàng loạt CV của một tin tuyển dụng
+# ---------------------------------------------------------------------------
+@router.post( "/jobs/{job_id}/extract-cvs", response_model=BulkCVExtractionResponse,)
+def extract_job_cvs( job_id: int, db: DbDep, current_user: UserDep,):
+    if current_user.role != "recruiter":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Chỉ nhà tuyển dụng mới được đọc CV.",
+        )
+
+    # Kiểm tra tin tuyển dụng và quyền sở hữu
+    job = db.scalar(
+        select(Job).where(
+            Job.id == job_id,
+            Job.created_by == current_user.id,
+            Job.deleted_at.is_(None),
+        )
+    )
+
+    if job is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Không tìm thấy tin tuyển dụng.",
+        )
+
+    # Lấy tất cả hồ sơ submitted chưa bị ứng viên ẩn
+    applications = application_service.get_submitted_applications_for_job(
+        db=db,
+        job_id=job_id,
+    )
+
+    results = []
+    success_count = 0
+    failed_count = 0
+
+    for application in applications:
+        candidate = db.get(User, application.user_id)
+
+        try:
+            if not application.resume_url:
+                raise ValueError("Hồ sơ chưa có file CV.")
+
+            extracted_text = cv_service.extract_cv_text(
+                application.resume_url
+            )
+
+            # Chỉ cập nhật trạng thái khi trích xuất thành công
+            application_service.update_application_status(
+                db=db,
+                application=application,
+                new_status="reviewing",
+            )
+
+            results.append(
+                ExtractedCVResult(
+                    application_id=application.id,
+                    candidate_name=candidate.full_name if candidate else "Không rõ",
+                    original_filename=application.original_filename,
+                    status="success",
+                    extracted_text=extracted_text,
+                )
+            )
+            success_count += 1
+        except Exception as exc:
+            results.append(
+                ExtractedCVResult(
+                    application_id=application.id,
+                    candidate_name=candidate.full_name if candidate else "Không rõ",
+                    original_filename=application.original_filename,
+                    status="failed",
+                    error_message=str(exc),
+                )
+            )
+            failed_count += 1
+
+    return BulkCVExtractionResponse(
+        job_id=job_id,
+        total=len(applications),
+        success_count=success_count,
+        failed_count=failed_count,
+        results=results,
+    )
+
+
 # ---------------------------------------------------------------------------
 # Admin: xem tất cả hồ sơ, bao gồm hồ sơ đã ẩn
 # ---------------------------------------------------------------------------
 @router.get("/admin", response_model=AdminApplicationListResponse)
-def search_all_applications(
-    db: DbDep,
-    current_user: UserDep,
-    job_id: int | None = Query(default=None, gt=0),
-    application_status: ApplicationStatusFilter | None = Query(default=None),
-    keyword: str | None = Query(default=None, min_length=1, max_length=100),
-    hidden_by_candidate: bool | None = Query(default=None),
-    page: int = Query(default=1, ge=1),
-    page_size: int = Query(default=10, ge=1, le=100),
-):
+def search_all_applications( db: DbDep, current_user: UserDep, job_id: int | None = Query(default=None, gt=0), application_status: ApplicationStatusFilter | None = Query(default=None), keyword: str | None = Query(default=None, min_length=1, max_length=100), hidden_by_candidate: bool | None = Query(default=None), page: int = Query(default=1, ge=1), page_size: int = Query(default=10, ge=1, le=100),):
     if current_user.role != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -336,26 +380,24 @@ def search_all_applications(
         page_size=page_size,
     )
 
+
+
 # ---------------------------------------------------------------------------
 # Chi tiết + tải CV (candidate chủ hồ sơ hoặc recruiter chủ tin)
 # ---------------------------------------------------------------------------
 @router.get("/{application_id}", response_model=ApplicationResponse)
-def get_application(
-    application_id: int,
-    db: DbDep,
-    current_user: UserDep,
-):
+def get_application( application_id: int, db: DbDep, current_user: UserDep,):
     return _get_viewable_application(db, application_id, current_user)
 
 
 
 @router.get("/{application_id}/cv")
-def download_application_cv(
-    application_id: int,
-    db: DbDep,
-    current_user: UserDep,
-):
-    application = _get_viewable_application(db, application_id, current_user)
+def view_application_cv( application_id: int, db: DbDep, current_user: UserDep,):
+    application = _get_viewable_application(
+        db,
+        application_id,
+        current_user,
+    )
 
     if not application.resume_url:
         raise HTTPException(
@@ -376,13 +418,18 @@ def download_application_cv(
             detail="Đường dẫn file CV không hợp lệ.",
         )
 
+    media_type = file_service.ALLOWED_EXTENSIONS.get(
+        file_path.suffix.lower()
+    )
+
     return FileResponse(
         path=file_path,
-        filename=application.original_filename or file_path.name,
-        media_type=file_service.ALLOWED_EXTENSIONS.get(
-            file_path.suffix.lower()
-        ),
-        headers={"Cache-Control": "no-store"},
+        media_type=media_type,
+        headers={
+            "Content-Disposition": "inline",
+            "Cache-Control": "private, no-store",
+            "X-Content-Type-Options": "nosniff",
+        },
     )
 
 
@@ -390,12 +437,7 @@ def download_application_cv(
 # Recruiter: đổi trạng thái hồ sơ
 # ---------------------------------------------------------------------------
 @router.patch("/{application_id}/status", response_model=ApplicationResponse)
-def update_application_status(
-    application_id: int,
-    data: ApplicationStatusUpdate,
-    db: DbDep,
-    current_user: UserDep,
-):
+def update_application_status( application_id: int, data: ApplicationStatusUpdate, db: DbDep, current_user: UserDep,):
     if current_user.role != "recruiter":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -427,11 +469,7 @@ def update_application_status(
 # Candidate: rút hồ sơ
 # ---------------------------------------------------------------------------
 @router.post("/{application_id}/withdraw", response_model=ApplicationResponse)
-def withdraw_application(
-    application_id: int,
-    db: DbDep,
-    current_user: UserDep,
-):
+def withdraw_application( application_id: int, db: DbDep, current_user: UserDep,):
     application = application_service.get_application_by_id(db, application_id)
 
     if (
@@ -451,11 +489,7 @@ def withdraw_application(
 # Candidate: ẩn hồ sơ đã được chấp nhận, từ chối hoặc rút
 # ---------------------------------------------------------------------------
 @router.post("/{application_id}/hide", response_model=ApplicationResponse)
-def hide_application(
-    application_id: int,
-    db: DbDep,
-    current_user: UserDep,
-):
+def hide_application( application_id: int, db: DbDep, current_user: UserDep,):
     application = application_service.get_application_by_id(
         db, application_id
     )
@@ -476,11 +510,7 @@ def hide_application(
 # Admin: khôi phục hồ sơ đã bị ứng viên ẩn
 # ---------------------------------------------------------------------------
 @router.post("/{application_id}/unhide", response_model=ApplicationResponse)
-def unhide_application(
-    application_id: int,
-    db: DbDep,
-    current_user: UserDep,
-):
+def unhide_application( application_id: int, db: DbDep, current_user: UserDep,):
     if current_user.role != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -501,13 +531,7 @@ def unhide_application(
 # Gửi multipart/form-data, trường nào gửi thì cập nhật trường đó.
 # ---------------------------------------------------------------------------
 @router.patch("/{application_id}", response_model=ApplicationResponse)
-async def update_application(
-    application_id: int,
-    db: DbDep,
-    current_user: UserDep,
-    cover_letter: str | None = Form(default=None, max_length=5000),
-    cv_file: UploadFile | None = File(default=None),
-):
+async def update_application( application_id: int, db: DbDep, current_user: UserDep, cover_letter: str | None = Form(default=None, max_length=5000), cv_file: UploadFile | None = File(default=None),):
     new_file = cv_file is not None and bool(cv_file.filename)
     new_path: str | None = None
 

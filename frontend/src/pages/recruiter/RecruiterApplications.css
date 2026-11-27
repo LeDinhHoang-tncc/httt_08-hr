@@ -105,21 +105,28 @@
 
 /* ---------- Thông báo ---------- */
 
-/* Đang tải / chưa có đơn phù hợp */
+/* Đang tải / chưa có đơn phù hợp / lỗi / thành công (chữ trần nằm trong trang) */
 .recruiter-applications > p {
   margin: 0 0 20px;
-  padding: 20px 24px;
+  padding: 16px 20px;
+  font-size: 0.92rem;
+  line-height: 1.5;
   color: var(--color-muted, #5b6776);
   background: #ffffff;
   border: 1px dashed var(--color-border, #e3e8ee);
   border-radius: 10px;
 }
 
-/* Lỗi */
-.recruiter-applications .error-message {
+.recruiter-applications > .error-message {
   color: #b42318;
   background: #fef3f2;
   border: 1px solid #f4b9b4;
+}
+
+.recruiter-applications > .success-message {
+  color: var(--color-brand-dark, #0a5247);
+  background: var(--color-brand-soft, #e6f2ef);
+  border: 1px solid #b7dad2;
 }
 
 /* ---------- Danh sách đơn ---------- */
@@ -145,11 +152,12 @@
   background: #ffffff;
   border: 1px solid var(--color-border, #e3e8ee);
   border-radius: 12px;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .recruiter-application-item:hover {
   border-color: var(--color-brand, #0e6b5c);
+  box-shadow: 0 4px 14px rgba(15, 25, 35, 0.06);
 }
 
 /* Tên ứng viên */
@@ -180,18 +188,127 @@
   border-top: none;
 }
 
-/* Khoảng cách giữa dòng thông tin cuối và nút */
-.recruiter-application-item p:last-of-type {
-  margin-bottom: 12px;
+/* ---------- Điều khiển trạng thái trong thẻ ---------- */
+
+.application-status-control {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  padding: 10px 0 12px;
+  border-top: 1px solid var(--color-border, #e3e8ee);
 }
 
-/* Nút "Xem chi tiết hồ sơ" */
-.recruiter-application-item a {
-  align-self: flex-start;
+.application-status-control label {
+  flex: 0 0 auto;
+  font-size: 0.86rem;
+  color: var(--color-text, #1f2a37);
+}
+
+/* Ô chọn trạng thái mới: gọn, cùng kiểu với ô lọc */
+.application-status-control select {
+  flex: 1 1 140px;
+  min-width: 0;
+  height: 34px;
+  padding: 0 32px 0 10px;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--color-text, #1f2a37);
+  background-color: #ffffff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%235b6776' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  border: 1.5px solid var(--color-border, #e3e8ee);
+  border-radius: 8px;
+  appearance: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.application-status-control select:hover:not(:disabled) {
+  border-color: #c9d1da;
+}
+
+.application-status-control select:focus {
+  outline: none;
+  border-color: var(--color-brand, #0e6b5c);
+  box-shadow: 0 0 0 3px rgba(14, 107, 92, 0.15);
+}
+
+.application-status-control select:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Hồ sơ đã kết thúc: không đổi được trạng thái, hiện dạng nhãn */
+.application-status-control > label + span {
+  padding: 3px 11px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-muted, #5b6776);
+  background: var(--color-page, #f6f8fa);
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--color-border, #e3e8ee);
+}
+
+/* "Đang cập nhật..." */
+.application-status-control > select ~ span {
+  flex: 0 0 100%;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--color-muted, #5b6776);
+}
+
+/* ---------- Nút thao tác trong thẻ: [Xem CV] [Xem chi tiết hồ sơ]
+   Tên class trùng với RecruiterApplicationDetail.css nên khai báo lại đầy đủ
+   (selector dài hơn) để không bị kiểu của trang chi tiết đè lên. ---------- */
+
+.recruiter-application-item .recruiter-application-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding: 12px 0 0;
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--color-border, #e3e8ee);
+  border-radius: 0;
+}
+
+/* "Xem CV": nút phụ dạng viền */
+.recruiter-application-item .recruiter-application-actions button {
+  flex: 0 0 auto;
+  height: 34px;
+  padding: 0 14px;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--color-brand, #0e6b5c);
+  background: transparent;
+  border: 1.5px solid var(--color-brand, #0e6b5c);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.recruiter-application-item .recruiter-application-actions button:hover:not(:disabled) {
+  background: var(--color-brand-soft, #e6f2ef);
+}
+
+.recruiter-application-item .recruiter-application-actions button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* "Xem chi tiết hồ sơ": nút chính */
+.recruiter-application-item .recruiter-application-actions a {
+  align-self: auto;
   display: inline-flex;
   align-items: center;
   height: 34px;
-  margin-top: auto;
+  margin: 0;
   padding: 0 14px;
   font-size: 0.84rem;
   font-weight: 600;
@@ -202,14 +319,165 @@
   transition: background-color 0.15s ease;
 }
 
-.recruiter-application-item a:hover {
+.recruiter-application-item .recruiter-application-actions a:hover {
   background: var(--color-brand-dark, #0a5247);
 }
 
 .recruiter-applications-header a:focus-visible,
-.recruiter-application-item a:focus-visible {
+.recruiter-application-item .recruiter-application-actions a:focus-visible,
+.recruiter-application-item .recruiter-application-actions button:focus-visible,
+.cv-modal-header button:focus-visible {
   outline: 3px solid rgba(14, 107, 92, 0.35);
   outline-offset: 2px;
+}
+
+/* ---------- Hộp xem CV (modal) ---------- */
+
+body:has(.cv-modal-overlay) {
+  overflow: hidden; /* khóa cuộn trang nền khi hộp đang mở */
+}
+
+.cv-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(15, 25, 35, 0.55);
+  animation: cv-fade 0.2s ease both;
+}
+
+.cv-modal {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 960px;
+  height: calc(100vh - 32px);
+  max-height: 900px;
+  overflow: hidden;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(15, 25, 35, 0.3);
+  animation: cv-pop 0.25s ease both;
+}
+
+.cv-modal-header {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 24px 14px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--color-border, #e3e8ee);
+}
+
+.cv-modal-header h2 {
+  margin: 0 0 4px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+/* Tên ứng viên */
+.cv-modal-header p {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--color-text, #1f2a37);
+  overflow-wrap: anywhere;
+}
+
+/* Tên file CV: nhỏ, mờ hơn */
+.cv-modal-header p + p {
+  margin-top: 2px;
+  font-size: 0.84rem;
+  font-weight: 400;
+  color: var(--color-muted, #5b6776);
+}
+
+/* Nút "Đóng" */
+.cv-modal-header button {
+  flex: none;
+  height: 36px;
+  padding: 0 16px;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--color-muted, #5b6776);
+  background: #ffffff;
+  border: 1.5px solid var(--color-border, #e3e8ee);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.cv-modal-header button:hover {
+  color: var(--color-text, #1f2a37);
+  background: var(--color-page, #f6f8fa);
+  border-color: #c9d1da;
+}
+
+/* Vùng nội dung chiếm hết chiều cao còn lại để file PDF hiển thị tối đa */
+.cv-modal-content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 24px 24px;
+  background: var(--color-page, #f6f8fa);
+}
+
+/* "Đang tải CV..." */
+.cv-modal-content > p {
+  margin: 0;
+  padding: 24px;
+  font-size: 0.95rem;
+  text-align: center;
+  color: var(--color-muted, #5b6776);
+}
+
+.cv-modal-content > .error-message {
+  padding: 12px 16px;
+  text-align: left;
+  color: #b42318;
+  background: #fef3f2;
+  border: 1px solid #f4b9b4;
+  border-radius: 8px;
+}
+
+.cv-modal-frame {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  background: #ffffff;
+  border: 1px solid var(--color-border, #e3e8ee);
+  border-radius: 10px;
+}
+
+@keyframes cv-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cv-pop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* ---------- Responsive ---------- */
@@ -239,13 +507,39 @@
   .recruiter-applications-header h1 {
     font-size: 1.4rem;
   }
+
+  /* Modal CV: gần như toàn màn hình để dễ đọc trên điện thoại */
+  .cv-modal-overlay {
+    padding: 8px;
+  }
+
+  .cv-modal {
+    height: calc(100vh - 16px);
+    border-radius: 12px;
+  }
+
+  .cv-modal-header {
+    padding: 14px 16px 12px;
+  }
+
+  .cv-modal-content {
+    padding: 12px 16px 16px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .recruiter-applications-header a,
   .recruiter-applications-filter select,
+  .application-status-control select,
   .recruiter-application-item,
-  .recruiter-application-item a {
+  .recruiter-application-item .recruiter-application-actions a,
+  .recruiter-application-item .recruiter-application-actions button,
+  .cv-modal-header button {
     transition: none;
+  }
+
+  .cv-modal-overlay,
+  .cv-modal {
+    animation: none;
   }
 }

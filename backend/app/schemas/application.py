@@ -5,11 +5,11 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 ApplicationStatus = Literal[
-    "submitted",
-    "reviewing",
-    "interview",
-    "accepted",
-    "rejected",
+    "submitted",    # nộp ok
+    "reviewing",    # xem xet
+    "interview",    # phẩn vóng
+    "accepted",     # ok
+    "rejected",    # chối từ
     "withdrawn",  # ứng viên tự rút hồ sơ
 ]
 
@@ -92,3 +92,20 @@ class AdminApplicationListResponse(BaseModel):
     total: int
     page: int
     page_size: int
+
+
+class ExtractedCVResult(BaseModel):
+    application_id: int
+    candidate_name: str
+    original_filename: str | None
+    status: Literal["success", "failed"]
+    extracted_text: str | None = None
+    error_message: str | None = None
+
+
+class BulkCVExtractionResponse(BaseModel):
+    job_id: int
+    total: int
+    success_count: int
+    failed_count: int
+    results: list[ExtractedCVResult]

@@ -62,6 +62,9 @@ function RecruiterApplicationDetail() {
 
   const [showStatusConfirm, setShowStatusConfirm] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const [cvUrl, setCvUrl] = useState<string | null>(null);
+  const [cvLoading, setCvLoading] = useState(false);
+  const [cvError, setCvError] = useState("");
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -133,6 +136,36 @@ function RecruiterApplicationDetail() {
       setAlertMessage(
         err instanceof Error ? err.message : "Không thể tải CV."
       );
+    }
+  };
+
+  const handleViewCV = async () => {
+    if (!application) return;
+
+    try {
+      setCvLoading(true);
+      setCvError("");
+
+      // Thu hồi URL cũ nếu có
+      if (cvUrl) {
+        window.URL.revokeObjectURL(cvUrl);
+        setCvUrl(null);
+      }
+
+      const blob = await downloadApplicationCV(application.id);
+
+      if (blob.type !== "application/pdf") {
+        throw new Error("Hiện tại chỉ hỗ trợ xem trực tiếp file PDF.");
+      }
+
+      const url = window.URL.createObjectURL(blob);
+      setCvUrl(url);
+    } catch (err) {
+      setCvError(
+        err instanceof Error ? err.message : "Không thể hiển thị CV."
+      );
+    } finally {
+      setCvLoading(false);
     }
   };
 
@@ -242,6 +275,29 @@ function RecruiterApplicationDetail() {
           </button>
         )}
 
+        {application.resume_url && (
+          <div className="application-cv-preview">
+            <button
+              type="button"
+              onClick={handleViewCV}
+              disabled={cvLoading}
+            >
+              {cvLoading ? "Đang tải CV..." : "Xem CV trực tiếp"}
+            </button>
+
+            {cvError && (
+              <p className="error-message">{cvError}</p>
+            )}
+
+            {cvUrl && (
+              <iframe
+                src={cvUrl}
+                title={`CV của ${application.candidate.full_name}`}
+                className="application-cv-frame"
+              />
+            )}
+          </div>
+        )}
         <h3>Thư giới thiệu</h3>
 
         <p>

@@ -7,6 +7,8 @@ from app.api.application import router as applications_router
 
 from app.api.admin import router as admin_router
 
+from app.api.interviews import router as interviews_router
+
 app = FastAPI(
     title="HR Recruitment API",
     description="API quản lý tuyển dụng nhân sự và xử lý CV ứng viên",
@@ -29,6 +31,7 @@ app.include_router(auth_router)
 app.include_router(jobs_router)
 app.include_router(applications_router)
 app.include_router(admin_router)
+app.include_router(interviews_router)
 
 @app.get("/")
 def root():

@@ -1,246 +1,281 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+
+import { getManagedJobs } from "../../services/jobService";
 import {
-  getManagedJobs,
-  completeJob,
-  deleteJob,
-} from "../../services/jobService";
+  getReceivedApplications,
+  type ApplicationStatus,
+} from "../../services/applicationService";
+
 import type { Job } from "../../types/job";
-import ConfirmDialog from "../../components/common/ConfirmDialog";
 
 import "./RecruiterDashboard.css";
 
-function getJobStatusLabel(status: Job["status"]): string {
-  const statusLabels: Record<string, string> = {
-    draft: "Bản nháp",
-    published: "Đang tuyển dụng",
-    completed: "Đã kết thúc",
-  };
 
-  return statusLabels[status] || status;
+interface DashboardStats {
+  totalJobs: number;
+  publishedJobs: number;
+  draftJobs: number;
+  completedJobs: number;
+  hiddenJobs: number;
+
+  totalApplications: number;
+  submittedApplications: number;
+  reviewingApplications: number;
+  interviewApplications: number;
+  acceptedApplications: number;
+  rejectedApplications: number;
+  withdrawnApplications: number;
 }
 
-function RecruiterDashboard() {
-  const { user } = useAuth();
+const initialStats: DashboardStats = {
+  totalJobs: 0,
+  publishedJobs: 0,
+  draftJobs: 0,
+  completedJobs: 0,
+  hiddenJobs: 0,
 
-  const [jobs, setJobs] = useState<Job[]>([]);
+  totalApplications: 0,
+  submittedApplications: 0,
+  reviewingApplications: 0,
+  interviewApplications: 0,
+  acceptedApplications: 0,
+  rejectedApplications: 0,
+  withdrawnApplications: 0,
+};
+
+const applicationStatuses: ApplicationStatus[] = [
+  "submitted",
+  "reviewing",
+  "interview",
+  "accepted",
+  "rejected",
+  "withdrawn",
+];
+
+function RecruiterDashboard() {
+  const [stats, setStats] = useState<DashboardStats>(initialStats);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [actionError, setActionError] = useState("");
-  const [completingId, setCompletingId] = useState<number | null>(null);
-
-  // Hành động đang chờ người dùng xác nhận trong hộp thoại
-  const [pendingAction, setPendingAction] = useState<{
-    type: "complete" | "delete";
-    job: Job;
-  } | null>(null);
+  const { user } = useAuth();
 
   useEffect(() => {
-    const fetchJobs = async () => {
+    let cancelled = false;
+
+    async function loadDashboard() {
       try {
         setLoading(true);
         setError("");
 
-        const data = await getManagedJobs();
-        setJobs(data);
-      } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Đã xảy ra lỗi khi tải danh sách tin tuyển dụng."
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
+        // Lấy toàn bộ tin tuyển dụng theo từng trang
+        const jobs: Job[] = [];
+        let page = 1;
 
-    fetchJobs();
+        while (true) {
+          const currentJobs = await getManagedJobs({
+            page,
+            pageSize: 100,
+          });
+
+          jobs.push(...currentJobs);
+
+          if (currentJobs.length < 100) {
+            break;
+          }
+
+          page++;
+        }
+
+        // Lấy tổng số hồ sơ và số lượng theo từng trạng thái
+        const [allApplications, ...applicationResults] =
+          await Promise.all([
+            getReceivedApplications({
+              page: 1,
+              pageSize: 1,
+            }),
+            ...applicationStatuses.map((status) =>
+              getReceivedApplications({
+                applicationStatus: status,
+                page: 1,
+                pageSize: 1,
+              })
+            ),
+          ]);
+
+        const applicationCounts = Object.fromEntries(
+          applicationStatuses.map((status, index) => [
+            status,
+            applicationResults[index].total,
+          ])
+        );
+
+        const newStats: DashboardStats = {
+          totalJobs: jobs.length,
+          publishedJobs: jobs.filter(
+            (job) => job.status === "published"
+          ).length,
+          draftJobs: jobs.filter(
+            (job) => job.status === "draft"
+          ).length,
+          completedJobs: jobs.filter(
+            (job) => job.status === "completed"
+          ).length,
+          hiddenJobs: jobs.filter((job) => job.is_hidden).length,
+
+          totalApplications: allApplications.total,
+          submittedApplications: applicationCounts.submitted,
+          reviewingApplications: applicationCounts.reviewing,
+          interviewApplications: applicationCounts.interview,
+          acceptedApplications: applicationCounts.accepted,
+          rejectedApplications: applicationCounts.rejected,
+          withdrawnApplications: applicationCounts.withdrawn,
+        };
+
+        if (!cancelled) {
+          setStats(newStats);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Không thể tải dữ liệu thống kê."
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadDashboard();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const handleCompleteJob = async (jobId: number) => {
-    try {
-      setCompletingId(jobId);
-      setActionError("");
+  if (loading) {
+    return (
+      <main className="recruiter-dashboard">
+        <p>Đang tải dữ liệu thống kê...</p>
+      </main>
+    );
+  }
 
-      const updatedJob = await completeJob(jobId);
-
-      setJobs((previous) =>
-        previous.map((job) =>
-          job.id === jobId ? updatedJob : job
-        )
-      );
-    } catch (err) {
-      setActionError(
-        err instanceof Error
-          ? err.message
-          : "Không thể kết thúc tin tuyển dụng."
-      );
-    } finally {
-      setCompletingId(null);
-    }
-  };
-
-  const handleDeleteJob = async (jobId: number) => {
-    try {
-      setActionError("");
-
-      await deleteJob(jobId);
-
-      setJobs((previous) =>
-        previous.filter((job) => job.id !== jobId)
-      );
-    } catch (err) {
-      setActionError(
-        err instanceof Error
-          ? err.message
-          : "Không thể xóa tin tuyển dụng."
-      );
-    }
-  };
-
-  const handleConfirmAction = async () => {
-    if (!pendingAction) return;
-
-    const { type, job } = pendingAction;
-    setPendingAction(null);
-
-    if (type === "complete") {
-      await handleCompleteJob(job.id);
-    } else {
-      await handleDeleteJob(job.id);
-    }
-  };
-
-  const isDeleteAction = pendingAction?.type === "delete";
-  const pendingTitle = pendingAction?.job.title ?? "";
+  if (error) {
+    return (
+      <main className="recruiter-dashboard">
+        <p className="error-message">{error}</p>
+      </main>
+    );
+  }
 
   return (
     <main className="recruiter-dashboard">
-      <section className="recruiter-info">
-        <h1>Trang nhà tuyển dụng</h1>
-        <p>Xin chào, {user?.full_name}!</p>
-        <p>Email: {user?.email}</p>
-      </section>
-
-      <section className="recruiter-jobs">
-        <h2>Tin tuyển dụng của tôi</h2>
-
-        <div className="recruiter-actions">
-          <Link to="/recruiter/jobs/create">
-            Đăng tin tuyển dụng
-          </Link>
+      <header className="dashboard-header">
+        <div className="dashboard-header-text">
+          <p className="dashboard-eyebrow">Trang nhà tuyển dụng</p>
+          <h1>Tổng quan tuyển dụng</h1>
+          <p className="dashboard-greeting">
+            Xin chào, {user?.full_name}! Theo dõi tình hình tuyển dụng của bạn.
+          </p>
         </div>
 
-        {loading && <p>Đang tải danh sách tin tuyển dụng...</p>}
+        <p className="dashboard-email">Email: {user?.email}</p>
+      </header>
 
-        {error && <p className="error-message">{error}</p>}
+      <section className="dashboard-section">
+        <h2>Thống kê tin tuyển dụng</h2>
 
-        {actionError && (
-          <p className="error-message">{actionError}</p>
-        )}
-
-        {!loading && !error && jobs.length === 0 && (
-          <p>Bạn chưa có tin tuyển dụng nào.</p>
-        )}
-
-        {!loading && !error && jobs.length > 0 && (
-          <div className="recruiter-job-list">
-            {jobs.map((job) => (
-              <article className="recruiter-job-item" key={job.id}>
-                <div className="job-item-head">
-                  <h3>{job.title}</h3>
-
-                  <span className={`job-status job-status--${job.status}`}>
-                    {getJobStatusLabel(job.status)}
-                  </span>
-                </div>
-
-                <dl className="job-meta">
-                  <div>
-                    <dt>Công ty</dt>
-                    <dd>{job.company_name}</dd>
-                  </div>
-
-                  <div>
-                    <dt>Địa điểm</dt>
-                    <dd>{job.location}</dd>
-                  </div>
-
-                  <div>
-                    <dt>Ngày tạo</dt>
-                    <dd>
-                      {new Date(job.created_at).toLocaleDateString("vi-VN")}
-                    </dd>
-                  </div>
-                </dl>
-
-                {job.is_hidden && (
-                  <p className="job-hidden-warning">
-                    Tin tuyển dụng đang bị Admin ẩn.
-                    Tin này hiện không hiển thị công khai trên trang chủ.
-                  </p>
-                )}
-
-                <div className="job-item-actions">
-                  <div className="job-actions-main">
-                    <Link
-                      to={`/recruiter/jobs/${job.id}/applications`}
-                      className="btn-job-primary"
-                    >
-                      Xem đơn ứng tuyển
-                    </Link>
-
-                    <Link
-                      to={`/recruiter/jobs/${job.id}/edit`}
-                      className="btn-job-secondary"
-                    >
-                      Chỉnh sửa
-                    </Link>
-                  </div>
-
-                  <div className="job-actions-danger">
-                    {job.status !== "completed" && (
-                      <button
-                        type="button"
-                        className="btn-job-complete"
-                        disabled={completingId !== null}
-                        onClick={() => setPendingAction({ type: "complete", job })}
-                      >
-                        {completingId === job.id
-                          ? "Đang xử lý..."
-                          : "Kết thúc tuyển dụng"}
-                      </button>
-                    )}
-
-                    <button
-                      type="button"
-                      className="btn-job-delete"
-                      onClick={() => setPendingAction({ type: "delete", job })}
-                    >
-                      Xóa tin
-                    </button>
-                  </div>
-                </div>
-              </article>
-            ))}
+        <div className="dashboard-stats">
+          <div className="stat-card">
+            <h3>Tổng số tin</h3>
+            <p>{stats.totalJobs}</p>
           </div>
-        )}
+
+          <div className="stat-card">
+            <h3>Đang tuyển dụng</h3>
+            <p>{stats.publishedJobs}</p>
+          </div>
+
+          <div className="stat-card">
+            <h3>Bản nháp</h3>
+            <p>{stats.draftJobs}</p>
+          </div>
+
+          <div className="stat-card">
+            <h3>Đã kết thúc</h3>
+            <p>{stats.completedJobs}</p>
+          </div>
+
+          <div className="stat-card">
+            <h3>Đang bị ẩn</h3>
+            <p>{stats.hiddenJobs}</p>
+          </div>
+        </div>
       </section>
 
-      <ConfirmDialog
-        open={pendingAction !== null}
-        variant={isDeleteAction ? "danger" : "default"}
-        title={
-          isDeleteAction ? "Xóa tin tuyển dụng?" : "Kết thúc tin tuyển dụng?"
-        }
-        message={`Bạn có chắc chắn muốn ${
-          isDeleteAction ? "xóa" : "kết thúc"
-        } tin tuyển dụng "${pendingTitle}" không?`}
-        confirmText={isDeleteAction ? "Xóa tin" : "Kết thúc tin"}
-        onConfirm={handleConfirmAction}
-        onCancel={() => setPendingAction(null)}
-      />
+      <section className="dashboard-section">
+        <h2>Thống kê hồ sơ ứng tuyển</h2>
+
+        <div className="dashboard-stats">
+          <div className="stat-card">
+            <h3>Tổng hồ sơ</h3>
+            <p>{stats.totalApplications}</p>
+          </div>
+
+          <div className="stat-card">
+            <h3>Đã nộp</h3>
+            <p>{stats.submittedApplications}</p>
+          </div>
+
+          <div className="stat-card">
+            <h3>Đang xem xét</h3>
+            <p>{stats.reviewingApplications}</p>
+          </div>
+
+          <div className="stat-card">
+            <h3>Phỏng vấn</h3>
+            <p>{stats.interviewApplications}</p>
+          </div>
+
+          <div className="stat-card">
+            <h3>Được chấp nhận</h3>
+            <p>{stats.acceptedApplications}</p>
+          </div>
+
+          <div className="stat-card">
+            <h3>Bị từ chối</h3>
+            <p>{stats.rejectedApplications}</p>
+          </div>
+
+          <div className="stat-card">
+            <h3>Đã rút đơn</h3>
+            <p>{stats.withdrawnApplications}</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="dashboard-section">
+        <h2>Truy cập nhanh</h2>
+
+        <div className="dashboard-actions">
+          <Link to="/recruiter/jobs">
+            Quản lý tin tuyển dụng
+          </Link>
+
+          <Link to="/recruiter/jobs/create">
+            Tạo tin tuyển dụng
+          </Link>
+
+          <Link to="/recruiter/interviews">
+            Quản lý lịch phỏng vấn
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }

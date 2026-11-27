@@ -373,17 +373,25 @@ def _change_status(
     return application
 
 
-def update_application_status(
-    db: Session,
-    application: Application,
-    new_status: str,
-) -> Application:
+
+def update_application_status( db: Session, application: Application, new_status: str,) -> Application:
     """Recruiter đổi trạng thái, có kiểm tra luồng hợp lệ."""
+
+    # Hồ sơ đã vào phỏng vấn phải được đánh giá
+    # thông qua chức năng quản lý phỏng vấn.
+    if application.status == "interview":
+        raise InvalidStatusTransitionError(
+            "Hồ sơ đã chuyển sang phỏng vấn. "
+            "Vui lòng đánh giá kết quả tại mục Quản lý phỏng vấn."
+        )
+
     allowed = ALLOWED_TRANSITIONS.get(application.status, set())
+
     if new_status not in allowed:
         raise InvalidStatusTransitionError(
             f"Không thể chuyển từ '{application.status}' sang '{new_status}'."
         )
+
     return _change_status(db, application, new_status)
 
 

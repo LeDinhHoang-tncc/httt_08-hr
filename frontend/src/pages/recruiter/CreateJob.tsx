@@ -169,7 +169,7 @@ function CreateJob() {
         </div>
 
         <div>
-          <label htmlFor="salary_min">Lương tối thiểu</label>
+          <label htmlFor="salary_min">Lương tối thiểu (USD)</label>
           <input
             id="salary_min"
             type="number"
@@ -181,7 +181,7 @@ function CreateJob() {
         </div>
 
         <div>
-          <label htmlFor="salary_max">Lương tối đa</label>
+          <label htmlFor="salary_max">Lương tối đa (USD)</label>
           <input
             id="salary_max"
             type="number"

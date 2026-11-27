@@ -77,7 +77,6 @@ function AdminApplications() {
                 setLoading(false);
             }
         };
-
         loadApplications();
     }, [page, keyword, hiddenFilter]);
         //

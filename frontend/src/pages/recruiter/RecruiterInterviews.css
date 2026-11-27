@@ -1,0 +1,1000 @@
+/* Dùng các biến màu khai báo trong Header.css */
+
+.recruiter-interviews {
+  width: 100%;
+  max-width: 1100px;
+  margin: 32px auto 56px; /* footer tự dính đáy nhờ margin-top:auto */
+  padding: 0 24px;
+  color: var(--color-text, #1f2a37);
+}
+
+/* ---------- Tiêu đề trang ---------- */
+
+.interviews-header {
+  margin-bottom: 28px;
+}
+
+.interviews-header h1 {
+  margin: 0 0 6px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+.interviews-header p {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--color-muted, #5b6776);
+}
+
+/* Đang tải / chưa có công việc */
+.recruiter-interviews > p {
+  margin: 0 0 20px;
+  padding: 20px 24px;
+  color: var(--color-muted, #5b6776);
+  background: #ffffff;
+  border: 1px dashed var(--color-border, #e3e8ee);
+  border-radius: 10px;
+}
+
+.recruiter-interviews > p.error-message {
+  color: #b42318;
+  background: #fef3f2;
+  border: 1px solid #f4b9b4;
+}
+
+/* ---------- Danh sách công việc: mỗi công việc là một hàng ngang ---------- */
+
+.interview-job-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* [tên công việc + công ty] [các chỉ số] [nút Xem chi tiết] */
+.interview-job-item {
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) minmax(0, 1.5fr) auto;
+  grid-template-areas:
+    "title summary action"
+    "company summary action";
+  align-items: center;
+  column-gap: 28px;
+  padding: 18px 22px;
+  background: #ffffff;
+  border: 1px solid var(--color-border, #e3e8ee);
+  border-radius: 12px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.interview-job-item:hover {
+  border-color: var(--color-brand, #0e6b5c);
+  box-shadow: 0 4px 14px rgba(15, 25, 35, 0.06);
+}
+
+.interview-job-item h2 {
+  grid-area: title;
+  align-self: end;
+  margin: 0 0 2px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--color-brand, #0e6b5c);
+  overflow-wrap: anywhere;
+}
+
+.interview-job-item > p {
+  grid-area: company;
+  align-self: start;
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-muted, #5b6776);
+  overflow-wrap: anywhere;
+}
+
+/* 4 chỉ số: nhãn nhỏ có vạch màu bên trái */
+.interview-job-summary {
+  grid-area: summary;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.interview-job-summary p {
+  --accent: #9aa5b1;
+
+  margin: 0;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--color-text, #1f2a37);
+  background: var(--color-page, #f6f8fa);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+}
+
+.interview-job-summary p:nth-child(2) {
+  --accent: #0e6b5c; /* Đã có lịch */
+}
+
+.interview-job-summary p:nth-child(3) {
+  --accent: #f2b441; /* Chưa lên lịch */
+}
+
+.interview-job-summary p:nth-child(4) {
+  --accent: #5b7cfa; /* Lịch sử */
+}
+
+.interview-job-item > button {
+  grid-area: action;
+  height: 40px;
+  padding: 0 20px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: #ffffff;
+  background: var(--color-brand, #0e6b5c);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.interview-job-item > button:hover {
+  background: var(--color-brand-dark, #0a5247);
+}
+
+/* ---------- Focus (bàn phím) ---------- */
+
+.interview-job-item > button:focus-visible,
+.interview-modal-header button:focus-visible,
+.interview-modal-candidates button:focus-visible,
+.interview-candidate-item > button:focus-visible,
+.interview-form-actions button:focus-visible,
+.candidate-current-interview a:focus-visible,
+.interview-history-item a:focus-visible {
+  outline: 3px solid rgba(14, 107, 92, 0.35);
+  outline-offset: 2px;
+}
+
+/* ---------- Hộp chi tiết (modal) ---------- */
+
+body:has(.interview-modal-overlay) {
+  overflow: hidden; /* khóa cuộn trang nền */
+}
+
+.interview-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(15, 25, 35, 0.5);
+  animation: interview-fade 0.2s ease both;
+}
+
+.interview-modal {
+  width: 100%;
+  max-width: 820px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(15, 25, 35, 0.25);
+  animation: interview-pop 0.25s ease both;
+}
+
+/* Đầu hộp dính phía trên khi cuộn */
+.interview-modal-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 28px 18px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--color-border, #e3e8ee);
+}
+
+.interview-modal-header h2 {
+  margin: 0 0 2px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+.interview-modal-header p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-muted, #5b6776);
+}
+
+.interview-modal-header button {
+  flex: none;
+  height: 36px;
+  padding: 0 16px;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--color-muted, #5b6776);
+  background: #ffffff;
+  border: 1.5px solid var(--color-border, #e3e8ee);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.interview-modal-header button:hover {
+  color: var(--color-text, #1f2a37);
+  background: var(--color-page, #f6f8fa);
+  border-color: #c9d1da;
+}
+
+/* ---------- Form tạo lịch phỏng vấn ---------- */
+
+.interview-create-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
+  margin: 24px 28px 0;
+  padding: 20px 22px;
+  background: #f8fafb;
+  border: 1px solid var(--color-border, #e3e8ee);
+  border-top: 3px solid var(--color-brand, #0e6b5c);
+  border-radius: 12px;
+  animation: interview-fade 0.2s ease both;
+}
+
+.interview-create-form h3 {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* "Số ứng viên được chọn: n" */
+.interview-create-form > p {
+  grid-column: 1 / -1;
+  justify-self: start;
+  margin: -6px 0 0;
+  padding: 3px 12px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--color-brand-dark, #0a5247);
+  background: var(--color-brand-soft, #e6f2ef);
+  border-radius: 999px;
+}
+
+/* Các ô nhập: tiêu đề, link/địa điểm, ghi chú chiếm trọn hàng.
+   Thời gian bắt đầu / kết thúc, hình thức nằm cạnh nhau. */
+.interview-create-form > div:nth-of-type(1),
+.interview-create-form > div:nth-of-type(5),
+.interview-create-form > div:nth-of-type(6) {
+  grid-column: 1 / -1;
+}
+
+.interview-create-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--color-text, #1f2a37);
+}
+
+.interview-create-form input,
+.interview-create-form select,
+.interview-create-form textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  height: 42px;
+  padding: 0 12px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  color: var(--color-text, #1f2a37);
+  background: #ffffff;
+  border: 1.5px solid var(--color-border, #e3e8ee);
+  border-radius: 8px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.interview-create-form textarea {
+  height: auto;
+  min-height: 92px;
+  padding: 10px 12px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.interview-create-form input::placeholder,
+.interview-create-form textarea::placeholder {
+  color: #9aa5b1;
+}
+
+.interview-create-form input:focus,
+.interview-create-form select:focus,
+.interview-create-form textarea:focus {
+  outline: none;
+  border-color: var(--color-brand, #0e6b5c);
+  box-shadow: 0 0 0 3px rgba(14, 107, 92, 0.18);
+}
+
+/* Lỗi nhập liệu */
+.interview-create-form .error-message {
+  grid-column: 1 / -1;
+  justify-self: stretch;
+  margin: 0;
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #b42318;
+  background: #fef3f2;
+  border: 1px solid #f4b9b4;
+  border-radius: 8px;
+}
+
+.interview-form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.interview-form-actions button {
+  height: 40px;
+  padding: 0 20px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+/* "Đóng form": nút phụ */
+.interview-form-actions button:first-child {
+  color: var(--color-muted, #5b6776);
+  background: #ffffff;
+  border: 1.5px solid var(--color-border, #e3e8ee);
+}
+
+.interview-form-actions button:first-child:hover:not(:disabled) {
+  background: var(--color-page, #f6f8fa);
+  border-color: #c9d1da;
+}
+
+/* "Xác nhận tạo lịch": nút chính */
+.interview-form-actions button:last-child {
+  color: #ffffff;
+  background: var(--color-brand, #0e6b5c);
+  border: 1.5px solid var(--color-brand, #0e6b5c);
+}
+
+.interview-form-actions button:last-child:hover:not(:disabled) {
+  background: var(--color-brand-dark, #0a5247);
+  border-color: var(--color-brand-dark, #0a5247);
+}
+
+.interview-form-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ---------- Khu vực ứng viên & lịch sử ---------- */
+
+.interview-modal-candidates {
+  display: flex;
+  flex-direction: column;
+  padding: 24px 28px 28px;
+}
+
+.interview-modal-candidates h3 {
+  margin: 0 0 14px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* "Tạo lịch phỏng vấn (n)": nút chính, hiện khi đã chọn ứng viên */
+.interview-modal-candidates > button {
+  align-self: flex-start;
+  height: 40px;
+  margin-bottom: 14px;
+  padding: 0 18px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--color-brand, #0e6b5c);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.interview-modal-candidates > button:hover {
+  background: var(--color-brand-dark, #0a5247);
+}
+
+/* "Hiện không có ứng viên nào..." */
+.interview-modal-candidates > p {
+  margin: 0;
+  padding: 16px 18px;
+  font-size: 0.92rem;
+  color: var(--color-muted, #5b6776);
+  background: var(--color-page, #f6f8fa);
+  border-radius: 10px;
+}
+
+/* ---------- Thẻ ứng viên ----------
+   Hàng 1: [tên + email] [ô chọn] [nút lịch sử]
+   Hàng 2: nhãn trạng thái hoặc khung lịch hiện tại
+   Hàng 3: lịch sử (khi mở) */
+
+.interview-candidate-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 12px;
+  margin-bottom: 12px;
+  padding: 16px 18px;
+  background: #ffffff;
+  border: 1px solid var(--color-border, #e3e8ee);
+  border-radius: 12px;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.interview-candidate-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Ứng viên đang được chọn để tạo lịch: viền + nền xanh nhạt để dễ nhận ra */
+.interview-candidate-item:has(input:checked) {
+  background: #f4faf8;
+  border-color: var(--color-brand, #0e6b5c);
+}
+
+.interview-candidate-info {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.interview-candidate-info h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.interview-candidate-info p {
+  margin: 2px 0 0;
+  font-size: 0.88rem;
+  color: var(--color-muted, #5b6776);
+  overflow-wrap: anywhere;
+}
+
+/* Ô chọn "Chọn để tạo lịch phỏng vấn": cả khối bấm được, vùng bấm rộng */
+.interview-candidate-item > label {
+  grid-column: 2;
+  grid-row: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--color-text, #1f2a37);
+  background: var(--color-page, #f6f8fa);
+  border: 1.5px solid var(--color-border, #e3e8ee);
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.interview-candidate-item > label:hover {
+  border-color: var(--color-brand, #0e6b5c);
+}
+
+.interview-candidate-item > label:has(input:checked) {
+  color: var(--color-brand-dark, #0a5247);
+  background: var(--color-brand-soft, #e6f2ef);
+  border-color: var(--color-brand, #0e6b5c);
+}
+
+.interview-candidate-item > label:has(input:focus-visible) {
+  outline: 3px solid rgba(14, 107, 92, 0.35);
+  outline-offset: 2px;
+}
+
+.interview-candidate-item > label input {
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  accent-color: var(--color-brand, #0e6b5c);
+  cursor: pointer;
+}
+
+/* Nút "Xem lịch sử (n)" */
+.interview-candidate-item > button {
+  grid-column: 3;
+  grid-row: 1;
+  height: 36px;
+  padding: 0 14px;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--color-brand, #0e6b5c);
+  background: transparent;
+  border: 1.5px solid var(--color-brand, #0e6b5c);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.interview-candidate-item > button:hover {
+  background: var(--color-brand-soft, #e6f2ef);
+}
+
+/* ---------- Nhãn trạng thái lịch phỏng vấn ---------- */
+
+.candidate-interview-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 11px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.5;
+  border-radius: 999px;
+}
+
+.candidate-interview-status::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  background: currentColor;
+  border-radius: 50%;
+}
+
+.candidate-interview-status--scheduled {
+  color: var(--color-brand-dark, #0a5247);
+  background: var(--color-brand-soft, #e6f2ef);
+}
+
+.candidate-interview-status--not-scheduled {
+  color: #92400e;
+  background: #fffbeb;
+  box-shadow: inset 0 0 0 1px #f5d78e;
+}
+
+/* Chưa có lịch: nhãn nằm hàng 2, sát lề trái */
+.interview-candidate-item > .candidate-interview-status {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  justify-self: start;
+}
+
+/* ---------- Lịch phỏng vấn hiện tại ---------- */
+
+.candidate-current-interview {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  padding: 14px 16px;
+  background: #f4faf8;
+  border: 1px solid #cfe7e1;
+  border-left: 4px solid var(--color-brand, #0e6b5c);
+  border-radius: 10px;
+}
+
+.candidate-interview-item .candidate-interview-status,
+.candidate-current-interview .candidate-interview-status {
+  margin-bottom: 8px;
+}
+
+.candidate-current-interview p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--color-muted, #5b6776);
+  overflow-wrap: anywhere;
+}
+
+/* Tên buổi phỏng vấn */
+.candidate-current-interview p:first-of-type {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--color-text, #1f2a37);
+}
+
+/* Link "Tham gia cuộc họp": dạng nút nhỏ để dễ bấm */
+.candidate-current-interview a,
+.interview-history-item a {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--color-brand, #0e6b5c);
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.candidate-current-interview a:hover,
+.interview-history-item a:hover {
+  background: var(--color-brand-dark, #0a5247);
+}
+
+/* ---------- Lịch sử phỏng vấn của ứng viên ---------- */
+
+.candidate-interview-history {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  padding-top: 14px;
+  border-top: 1px dashed var(--color-border, #e3e8ee);
+}
+
+/* Tiêu đề nhỏ "Lịch sử phỏng vấn" */
+.candidate-interview-history h5 {
+  margin: 0 0 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--color-muted, #5b6776);
+}
+
+/* "Ứng viên chưa có lịch sử phỏng vấn." */
+.candidate-interview-history > p {
+  margin: 0;
+  padding: 12px 14px;
+  font-size: 0.88rem;
+  color: var(--color-muted, #5b6776);
+  background: var(--color-page, #f6f8fa);
+  border-radius: 8px;
+}
+
+.interview-history-item {
+  margin-bottom: 10px;
+  padding: 14px 16px;
+  background: #f8fafb;
+  border: 1px solid var(--color-border, #e3e8ee);
+  border-radius: 10px;
+}
+
+.interview-history-item:last-child {
+  margin-bottom: 0;
+}
+
+.interview-history-item h6 {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.interview-history-item p {
+  margin: 0 0 4px;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: var(--color-muted, #5b6776);
+  overflow-wrap: anywhere;
+}
+
+.interview-history-item p:last-child {
+  margin-bottom: 0;
+}
+
+/* ---------- Hiệu ứng ---------- */
+
+@keyframes interview-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes interview-pop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+  .interview-job-item {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "title"
+      "company"
+      "summary"
+      "action";
+    row-gap: 0;
+  }
+
+  .interview-job-summary {
+    margin: 14px 0 16px;
+  }
+
+  .interview-job-item > button {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 640px) {
+  .recruiter-interviews {
+    margin: 16px auto 40px;
+    padding: 0 16px;
+  }
+
+  .interviews-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .interview-modal-header {
+    padding: 18px 18px 14px;
+  }
+
+  .interview-create-form {
+    grid-template-columns: 1fr;
+    margin: 18px 18px 0;
+    padding: 16px;
+  }
+
+  .interview-create-form > div:nth-of-type(n) {
+    grid-column: 1;
+  }
+
+  .interview-create-form > div.interview-form-actions {
+    grid-column: 1;
+  }
+
+  .interview-modal-candidates {
+    padding: 20px 18px 24px;
+  }
+
+  /* Thẻ ứng viên xếp một cột theo thứ tự tự nhiên */
+  .interview-candidate-item {
+    grid-template-columns: 1fr;
+  }
+
+  .interview-candidate-info,
+  .interview-candidate-item > label,
+  .interview-candidate-item > button,
+  .interview-candidate-item > .candidate-interview-status,
+  .candidate-current-interview,
+  .candidate-interview-history {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .interview-candidate-item > label,
+  .interview-candidate-item > button {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 480px) {
+  .interview-form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .interview-form-actions button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interview-job-item,
+  .interview-job-item > button,
+  .interview-modal-header button,
+  .interview-candidate-item,
+  .interview-candidate-item > label,
+  .interview-candidate-item > button,
+  .interview-create-form input,
+  .interview-create-form select,
+  .interview-create-form textarea {
+    transition: none;
+  }
+
+  .interview-modal-overlay,
+  .interview-modal,
+  .interview-create-form {
+    animation: none;
+  }
+}
+
+/* ---------- Danh sách buổi phỏng vấn + nút hủy lịch ----------
+   Dán đoạn này vào RecruiterInterviews.css, ngay TRƯỚC mục "Hiệu ứng"
+   (hoặc trước "Responsive" nếu bạn không có mục Hiệu ứng). */
+
+/* Khối "Danh sách buổi phỏng vấn": nằm giữa form tạo lịch và danh sách ứng viên */
+.interview-session-management {
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--color-border, #e3e8ee);
+}
+
+.interview-session-management h3 {
+  margin: 0 0 14px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* "Chưa có buổi phỏng vấn nào được tạo." */
+.interview-session-management > p {
+  margin: 0;
+  padding: 16px 18px;
+  font-size: 0.92rem;
+  color: var(--color-muted, #5b6776);
+  background: var(--color-page, #f6f8fa);
+  border-radius: 10px;
+}
+
+/* ---------- Thẻ một buổi phỏng vấn ---------- */
+
+.interview-session-item {
+  margin-bottom: 12px;
+  padding: 16px 18px;
+  background: #ffffff;
+  border: 1px solid var(--color-border, #e3e8ee);
+  border-left: 4px solid var(--color-brand, #0e6b5c);
+  border-radius: 12px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.interview-session-item:last-child {
+  margin-bottom: 0;
+}
+
+.interview-session-item:hover {
+  border-color: var(--color-brand, #0e6b5c);
+  box-shadow: 0 4px 14px rgba(15, 25, 35, 0.06);
+}
+
+/* Tên buổi phỏng vấn */
+.interview-session-item h4 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--color-brand, #0e6b5c);
+  overflow-wrap: anywhere;
+}
+
+/* Thời gian, hình thức, trạng thái */
+.interview-session-item p {
+  margin: 0 0 4px;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--color-muted, #5b6776);
+  overflow-wrap: anywhere;
+}
+
+/* "Ứng viên tham gia": tiêu đề nhỏ, có đường kẻ ngăn */
+.interview-session-item h5 {
+  margin: 14px 0 8px;
+  padding-top: 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--color-muted, #5b6776);
+  border-top: 1px dashed var(--color-border, #e3e8ee);
+}
+
+/* Mỗi ứng viên là một dòng nền xám nhạt (chỉ các <p> nằm sau tiêu đề h5) */
+.interview-session-item h5 ~ p {
+  margin: 0 0 6px;
+  padding: 8px 12px;
+  font-size: 0.88rem;
+  color: var(--color-text, #1f2a37);
+  background: var(--color-page, #f6f8fa);
+  border-radius: 8px;
+}
+
+/* ---------- Nút hủy (hành động nguy hiểm: viền đỏ, nền trong suốt) ---------- */
+
+.interview-session-item > button,
+.interview-cancel-actions button {
+  height: 36px;
+  padding: 0 14px;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #b42318;
+  background: transparent;
+  border: 1.5px solid #f4b9b4;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.interview-session-item > button {
+  display: block;
+  margin-top: 14px;
+}
+
+.interview-session-item > button:hover:not(:disabled),
+.interview-cancel-actions button:hover:not(:disabled) {
+  background: #fef3f2;
+  border-color: #b42318;
+}
+
+.interview-session-item > button:disabled,
+.interview-cancel-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.interview-session-item > button:focus-visible,
+.interview-cancel-actions button:focus-visible {
+  outline: 3px solid rgba(180, 35, 24, 0.3);
+  outline-offset: 2px;
+}
+
+/* "Hủy lịch ứng viên này": nằm cuối khung lịch hiện tại của từng ứng viên */
+.interview-cancel-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed #cfe7e1;
+}
+
+/* ---------- Responsive cho khối buổi phỏng vấn ---------- */
+
+@media (max-width: 640px) {
+  .interview-session-management {
+    padding: 20px 18px;
+  }
+
+  .interview-session-item {
+    padding: 14px 16px;
+  }
+
+  .interview-cancel-actions {
+    justify-content: stretch;
+  }
+
+  .interview-cancel-actions button,
+  .interview-session-item > button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interview-session-item,
+  .interview-session-item > button,
+  .interview-cancel-actions button {
+    transition: none;
+  }
+}

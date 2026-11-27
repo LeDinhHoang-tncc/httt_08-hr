@@ -16,10 +16,12 @@ import CandidateApplicationDetail from "./pages/candidate/CandidateApplicationDe
 import CandidateDashboard from "./pages/candidate/CandidateDashboard";
 
 import RecruiterDashboard from "./pages/recruiter/RecruiterDashboard";
+import RecruiterJobs from "./pages/recruiter/RecruiterJobs";
 import CreateJob from "./pages/recruiter/CreateJob";
 import EditJob from "./pages/recruiter/EditJob";
 import RecruiterApplications from "./pages/recruiter/RecruiterApplications";
 import RecruiterApplicationDetail from "./pages/recruiter/RecruiterApplicationDetail";
+import RecruiterInterviews from "./pages/recruiter/RecruiterInterviews";
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
@@ -252,10 +254,12 @@ function App() {
     {/* Các trang dành cho nhà tuyển dụng */}
     <Route element={<ProtectedRoute allowedRoles={["recruiter"]} />}>
       <Route path="/recruiter/dashboard" element={<RecruiterDashboard />}/>
+      <Route path="/recruiter/jobs" element={<RecruiterJobs />} />
       <Route path="/recruiter/jobs/create" element={<CreateJob />}/>
       <Route path="/recruiter/jobs/:jobId/edit" element={<EditJob />}/>
       <Route path="/recruiter/jobs/:jobId/applications" element={<RecruiterApplications />}/>
       <Route path="/recruiter/jobs/:jobId/applications/:applicationId" element={<RecruiterApplicationDetail />}/>
+      <Route path="/recruiter/interviews" element={<RecruiterInterviews />}/>
     </Route>
     {/* Các trang dành cho Admin */}
     <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>

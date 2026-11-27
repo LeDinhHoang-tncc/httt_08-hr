@@ -2,10 +2,16 @@ front thêm chỗ đăng ký lại hr
 
 lọc cv theo công việc tuyển dụng và lọc tin tuyển dụng theo công việc cho phía hr và nhân viên
 
-phân loại tin tuyển dụng theo loại trnajg thái (3 tab ) nháp, đnag tuyển và kết thúc tuyển dụng (giao diện dashboard của hr)
-
-thêm chức năng lên lịch hẹn phỏng vấn cho hr và ứng viên
+phân loại tin tuyển dụng theo loại trạng thái (3 tab ) nháp, đnag tuyển và kết thúc tuyển dụng (giao diện dashboard của hr)
 
 ứng viên thấy được email của hr
 
 rà soát lại toàn bộ hệ thống tìm mấy chỗ còn tiếng anh thì viết lại
+
+biều đồ thống kê số liệu cho nhà tuyển dụng
+
+thêm chức năng tải về đồng loạt cv trong 1 tin tuyển dụng
+
+chỗ chọn ứng viên để lên lịch cần thanh tìm kiếm
+
+chỗ đánh giá kết quả phỏng vấn ngay chỗ lịch pv

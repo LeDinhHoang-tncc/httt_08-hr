@@ -12,7 +12,7 @@ load_dotenv(
 class Settings:
     SECRET_KEY: str = os.getenv("SECRET_KEY", "")
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30 #phiên đăng nhập test 30s
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 3000 #phiên đăng nhập test 30s
 
 
 settings = Settings()
